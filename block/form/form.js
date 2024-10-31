@@ -49,7 +49,7 @@ async function sendEmail(formData) {
     secure: true,
     auth: {
       user: 'tori.g.m.thomas@gmail.com',   // Sender email
-      pass: 'dfgdfgdfg18!'          // Password or app-specific password for this email
+      pass: 'dfgdfgdfg18!'                 // Password or app-specific password for this email
     }
   });
 
