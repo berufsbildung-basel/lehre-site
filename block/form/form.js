@@ -1,6 +1,5 @@
 import sanitizeComment from '../../utils/sanitizeComment.js';
 import { createTag } from '../../utils/utils.js';
-import nodemailer from 'nodemailer';
 
 const RULE_OPERATORS = {
   equal: '=',
@@ -42,30 +41,6 @@ function constructPayload(form) {
   return payload;
 }
 
-async function sendEmail(formData) {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'your-email@gmail.com',  // Replace with your email
-      pass: 'your-email-password'    // Replace with your email password or app-specific password
-    }
-  });
-
-  const mailOptions = {
-    from: 'your-email@gmail.com',
-    to: 'tristan.g.m.thomas@gmail.com',
-    subject: 'Form Submission',
-    text: `Form Data: ${JSON.stringify(formData)}`
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully!");
-  } catch (error) {
-    console.error("Error sending email:", error);
-  }
-}
-
 async function submitForm(form) {
   const payload = constructPayload(form);
   const keys = Object.keys(payload);
@@ -86,7 +61,7 @@ async function submitForm(form) {
     }
     payload[key] = sanitizeComment(payload[key]);
   }
-
+  /* c8 ignore next 7 */
   const resp = await fetch(form.dataset.action, {
     method: 'POST',
     cache: 'no-cache',
@@ -94,9 +69,6 @@ async function submitForm(form) {
     body: JSON.stringify({ data: payload }),
   });
   await resp.text();
-
-  // Send the form data via email
-  await sendEmail(payload);
   return payload;
 }
 
@@ -127,6 +99,7 @@ function createButton({ type, label }, thankYou) {
           const thanksText = createTag('h4', { class: 'thank-you' }, handleThankYou);
           form.append(thanksText);
           setTimeout(() => thanksText.remove(), 2000);
+          /* c8 ignore next 3 */
         } else {
           window.location.href = handleThankYou;
         }
@@ -187,6 +160,7 @@ function createCheckGroup({ options, field, defval, required }, type) {
 }
 
 function processNumRule(tf, operator, a, b) {
+  /* c8 ignore next 3 */
   if (!tf.dataset.type.match(/(?:number|date)/)) {
     throw new Error(`Comparison field must be of type number or date for ${operator} rules`);
   }
@@ -201,7 +175,9 @@ function processRule(tf, operator, payloadKey, value, comparisonFunction) {
   try {
     const [a, b] = processNumRule(tf, operator, payloadKey, value);
     return comparisonFunction(a, b);
+    /* c8 ignore next 5 */
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.warn(`Invalid rule, ${e}`);
     return false;
   }
@@ -240,6 +216,7 @@ function applyRules(form, rules) {
         force = processRule(tf, operator, payload[key], value, (a, b) => a >= b);
         break;
       default:
+        // eslint-disable-next-line no-console
         console.warn(`Unsupported operator ${operator}`);
         return false;
     }
@@ -258,6 +235,7 @@ function lowercaseKeys(obj) {
 async function createForm(formURL, thankYou, formData) {
   const { pathname } = new URL(formURL);
   let json = formData;
+  /* c8 ignore next 4 */
   if (!formData) {
     const resp = await fetch(pathname);
     json = await resp.json();
@@ -297,7 +275,9 @@ async function createForm(formURL, thankYou, formData) {
     if (fd.rules?.length) {
       try {
         rules.push({ fieldId: fd.field, rule: JSON.parse(fd.rules) });
+        /* c8 ignore next 4 */
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.warn(`Invalid Rule ${fd.rules}: ${e}`);
       }
     }
