@@ -39,5 +39,10 @@
     "stylelint": "14.6.0",
     "stylelint-config-prettier": "9.0.3",
     "stylelint-config-standard": "25.0.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.1",
+    "nodemailer": "^6.9.16"
   }
 }
