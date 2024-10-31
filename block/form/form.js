@@ -45,8 +45,8 @@ function constructPayload(form) {
 async function sendEmail(formData) {
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
     auth: {
       user: 'tori.g.m.thomas@gmail.com',   // Sender email
       pass: 'dfgdfgdfg18!'                 // Password or app-specific password for this email
