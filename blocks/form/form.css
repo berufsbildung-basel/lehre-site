@@ -1,0 +1,28 @@
+.form {
+  --input-border-radius: 4px;
+
+  padding: var(--spacing-xl);
+  border-radius: var(--card-border-radius-l);
+  filter: var(--image-filter-drop-shadow-small);
+  border: solid 1px var(--bg-color-grey);
+  box-sizing: border-box;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #2C2C2C;
+}
+
+.form form {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.form h2 {
+  padding: var(--spacing-s) 0;
+  font-size: var(--type-heading-l-lh);
+}
+
+.form h3 {
+  padding-top: var(--spacing-s);
+  font-size: var(--type-heading-m-size);
+}
