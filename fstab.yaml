@@ -1,7 +1,2 @@
-# Notes:
-#
-# 1. The URL should be human readable as a path. It should not be a hash.
-# 2. Google Drive is no longer allowed for production Adobe projects.
-
 mountpoints:
-  /: https://adobe.sharepoint.com/sites/HelixProjects/Shared%20Documents/sites/berufsbildung-basel/lehre-site
+  /: https://drive.google.com/drive/u/0/folders/1MGzOt7ubUh3gu7zhZIPb7R7dyRzG371j
