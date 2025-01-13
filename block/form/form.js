@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config()
 import sanitizeComment from '../../utils/sanitizeComment.js';
 import { createTag } from '../../utils/utils.js';
 
@@ -42,35 +44,31 @@ function constructPayload(form) {
 }
 
 async function submitForm(form) {
-  const payload = constructPayload(form);
-  const keys = Object.keys(payload);
-  payload.timestamp = new Date().toJSON();
-  for (const key of keys) {
-    const field = form.querySelector(`[data-field-id=${key}]`);
-    if (!payload[key] && field.querySelector('.group-container.required')) {
-      const el = form.querySelector(`input[name="${key}"]`);
-      el.setCustomValidity('A selection is required');
-      el.reportValidity();
-      const cb = () => {
-        el.setCustomValidity('');
-        el.reportValidity();
-        field.removeEventListener('input', cb);
-      };
-      field.addEventListener('input', cb);
-      return false;
+  const payload = constructPayload(form); // Convert form data to JSON
+  payload.timestamp = new Date().toISOString(); // Add a timestamp to the payload
+
+  try {
+    const response = await fetch('https://your-cloudflare-worker-url/form-handler', { // Replace with your Cloudflare Worker URL
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': process.env.API_KEY, // Secure API key to authenticate the request
+      },
+      body: JSON.stringify(payload), // Convert payload to JSON string
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
     }
-    payload[key] = sanitizeComment(payload[key]);
+
+    const result = await response.json();
+    return result; // Use the response in the frontend as needed
+  } catch (error) {
+    console.error('Form submission failed:', error);
+    return { status: 'error', message: error.message };
   }
-  /* c8 ignore next 7 */
-  const resp = await fetch(form.dataset.action, {
-    method: 'POST',
-    cache: 'no-cache',
-    headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ data: payload }),
-  });
-  await resp.text();
-  return payload;
 }
+
 
 function clearForm(form) {
   [...form.elements].forEach((fe) => {
