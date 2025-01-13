@@ -42,34 +42,20 @@ function constructPayload(form) {
 }
 
 async function submitForm(form) {
-  const payload = constructPayload(form);
-  const keys = Object.keys(payload);
-  payload.timestamp = new Date().toJSON();
-  for (const key of keys) {
-    const field = form.querySelector(`[data-field-id=${key}]`);
-    if (!payload[key] && field.querySelector('.group-container.required')) {
-      const el = form.querySelector(`input[name="${key}"]`);
-      el.setCustomValidity('A selection is required');
-      el.reportValidity();
-      const cb = () => {
-        el.setCustomValidity('');
-        el.reportValidity();
-        field.removeEventListener('input', cb);
-      };
-      field.addEventListener('input', cb);
-      return false;
-    }
-    payload[key] = sanitizeComment(payload[key]);
-  }
-  /* c8 ignore next 7 */
-  const resp = await fetch(form.dataset.action, {
+  const payload = constructPayload(form); // Converts form data to JSON
+  payload.timestamp = new Date().toISOString();
+
+  const response = await fetch('https://your-fastly-service-url/form-handler', { // Replace with your Fastly URL
     method: 'POST',
-    cache: 'no-cache',
-    headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ data: payload }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'your-secure-api-key', // API Key for authentication
+    },
+    body: JSON.stringify(payload),
   });
-  await resp.text();
-  return payload;
+
+  const result = await response.json();
+  return result;
 }
 
 function clearForm(form) {
