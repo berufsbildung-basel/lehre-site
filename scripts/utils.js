@@ -56,7 +56,3 @@ export function decorateArea(area = document) {
     eagerLoad(marquee, 'div:last-child > div:last-child img');
   }());
 }
-
-export async function useMiloSample() {
-  const { createTag } = await import(`${getLibs()}/utils/utils.js`);
-}
