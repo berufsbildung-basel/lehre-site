@@ -48,7 +48,7 @@ async function submitForm(form) {
   payload.timestamp = new Date().toISOString(); // Add a timestamp to the payload
 
   try {
-    const response = await fetch('https://your-cloudflare-worker-url/form-handler', { // Replace with your Cloudflare Worker URL
+    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', { // Replace with your Cloudflare Worker URL
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +68,6 @@ async function submitForm(form) {
     return { status: 'error', message: error.message };
   }
 }
-
 
 function clearForm(form) {
   [...form.elements].forEach((fe) => {
