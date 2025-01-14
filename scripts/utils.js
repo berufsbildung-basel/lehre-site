@@ -13,6 +13,7 @@
 /**
  * The decision engine for where to get Milo's libs from.
  */
+ 
  export const [setLibs, getLibs] = (() => {
   let libs;
   let customFormLoaded = false;
@@ -27,7 +28,7 @@
         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
       })();
 
-      // Load custom form.js and ensure Milo library's form.js is not loaded
+      // Load custom form.js
       if (!customFormLoaded) {
         const customFormScript = document.createElement('script');
         customFormScript.src = 'https://main--lehre-site--berufsbildung-basel.hlx.page/block/form/form.js'; // Replace with your custom form.js URL
@@ -35,21 +36,6 @@
         customFormScript.onload = () => {
           console.log('Custom form.js loaded successfully.');
           customFormLoaded = true;
-
-          // Override the script loading to block only Milo's form.js
-          const originalCreateElement = document.createElement.bind(document);
-          document.createElement = (tagName) => {
-            const element = originalCreateElement(tagName);
-            if (
-              tagName === 'script' &&
-              element.src &&
-              element.src.includes('/libs/blocks/form/form.js')
-            ) {
-              console.warn('Blocked loading Milo library form.js');
-              return null; // Block loading of Milo's form.js
-            }
-            return element;
-          };
         };
         customFormScript.onerror = () => {
           console.error('Failed to load custom form.js.');
@@ -59,6 +45,19 @@
         const head = document.head || document.getElementsByTagName('head')[0];
         head.insertBefore(customFormScript, head.firstChild);
       }
+
+      // Intercept and block Milo library's form.js
+      const originalAppendChild = document.head.appendChild.bind(document.head);
+      document.head.appendChild = (element) => {
+        if (
+          element.tagName === 'SCRIPT' &&
+          element.src.includes('/libs/blocks/form/form.js')
+        ) {
+          console.warn('Blocked loading Milo library form.js');
+          return null;
+        }
+        return originalAppendChild(element);
+      };
 
       return libs;
     },
