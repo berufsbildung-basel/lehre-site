@@ -1,7 +1,3 @@
-*
- * Marquee - v6.0
- */
-
 import { decorateButtons, getBlockSize, decorateBlockBg, loadCDT } from '../../utils/decorate.js';
 import { createTag, getConfig, loadStyle } from '../../utils/utils.js';
 
