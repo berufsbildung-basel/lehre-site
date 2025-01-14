@@ -27,7 +27,7 @@
         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
       })();
 
-      // Load custom form.js before the library one
+      // Load custom form.js and ensure Milo library's form.js is not loaded
       if (!customFormLoaded) {
         const customFormScript = document.createElement('script');
         customFormScript.src = 'https://main--lehre-site--berufsbildung-basel.hlx.page/block/form/form.js'; // Replace with your custom form.js URL
@@ -35,12 +35,27 @@
         customFormScript.onload = () => {
           console.log('Custom form.js loaded successfully.');
           customFormLoaded = true;
+
+          // Once custom form.js is loaded, override the Milo library's script loading behavior
+          const originalCreateElement = document.createElement.bind(document);
+          document.createElement = (tagName) => {
+            const element = originalCreateElement(tagName);
+            if (
+              tagName === 'script' &&
+              element.src &&
+              element.src.includes('/libs/blocks/form/form.js')
+            ) {
+              console.warn('Blocked loading Milo library form.js');
+              return null; // Prevent the library form.js from being created
+            }
+            return element;
+          };
         };
         customFormScript.onerror = () => {
           console.error('Failed to load custom form.js.');
         };
 
-        // Insert your custom script before other scripts
+        // Insert your custom script into the document head
         const head = document.head || document.getElementsByTagName('head')[0];
         head.insertBefore(customFormScript, head.firstChild);
       }
@@ -50,7 +65,6 @@
     () => libs,
   ];
 })();
-
 
 /*
  * ------------------------------------------------------------
