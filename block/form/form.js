@@ -59,7 +59,15 @@ async function submitForm(form) {
       throw new Error(`Error: ${response.statusText}`);
     }
 
+    // Log success message to the console
+    console.log('POST request successful:', {
+      status: response.status,
+      statusText: response.statusText,
+      payload,
+    });
+
     const result = await response.json();
+    console.log('Response from server:', result); // Log the server response
     return result; 
   } catch (error) {
     console.error('Form submission failed:', error);
