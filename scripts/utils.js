@@ -13,7 +13,7 @@
 /**
  * The decision engine for where to get Milo's libs from.
  */
- export const [setLibs, getLibs] = (() => {
+export const [setLibs, getLibs] = (() => {
   let libs;
   return [
     (prodLibs, location) => {
@@ -24,20 +24,10 @@
         if (branch === 'local') return 'http://localhost:6456/libs';
         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
       })();
-
-      // Ensure form.js is replaced with the custom version
-      const customFormPath = 'https://github.com/berufsbildung-basel/lehre-site/blob/main/block/form/form.js'; // Replace with your custom path
-      if (libs.includes('blocks/form/form.js')) {
-        libs = libs.replace('blocks/form/form.js', customFormPath);
-      }
-
-      console.log('Final libs path:', libs);
       return libs;
-    },
-    () => libs,
+    }, () => libs,
   ];
 })();
-
 
 /*
  * ------------------------------------------------------------
