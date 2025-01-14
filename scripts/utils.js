@@ -15,7 +15,7 @@
  */
  export const [setLibs, getLibs] = (() => {
   let libs;
-  let customFormLoaded = true;
+  let customFormLoaded = false;
 
   return [
     (prodLibs, location) => {
@@ -36,7 +36,7 @@
           console.log('Custom form.js loaded successfully.');
           customFormLoaded = true;
 
-          // Once custom form.js is loaded, override the Milo library's script loading behavior
+          // Override the script loading to block only Milo's form.js
           const originalCreateElement = document.createElement.bind(document);
           document.createElement = (tagName) => {
             const element = originalCreateElement(tagName);
@@ -46,7 +46,7 @@
               element.src.includes('/libs/blocks/form/form.js')
             ) {
               console.warn('Blocked loading Milo library form.js');
-              return null; // Prevent the library form.js from being created
+              return null; // Block loading of Milo's form.js
             }
             return element;
           };
