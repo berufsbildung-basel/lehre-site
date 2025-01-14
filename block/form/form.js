@@ -1,5 +1,7 @@
-import dotenv from '/block/form/.env';
-dotenv.config()
+import dotenv from 'dotenv';
+dotenv.config({ path: path.resolve(__dirname, './block/form/.env')})
+import sanitizeComment from '../../utils/sanitizeComment.js';
+import { createTag } from '../../utils/utils.js';
 
 const RULE_OPERATORS = {
   equal: '=',
