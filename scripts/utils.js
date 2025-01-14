@@ -15,6 +15,8 @@
  */
  export const [setLibs, getLibs] = (() => {
   let libs;
+  let customFormLoaded = false;
+
   return [
     (prodLibs, location) => {
       libs = (() => {
@@ -25,19 +27,29 @@
         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
       })();
 
-      // Ensure form.js is replaced with the custom version
-      const customFormPath = 'https://main--lehre-site--berufsbildung-basel.hlx.page/block/form/form.js'; // Replace with your custom path
-      if (libs.includes('blocks/form/form.js')) {
-        libs = libs.replace('blocks/form/form.js', customFormPath);
+      // Load custom form.js before the library one
+      if (!customFormLoaded) {
+        const customFormScript = document.createElement('script');
+        customFormScript.src = 'https://main--lehre-site--berufsbildung-basel.hlx.page/block/form/form.js'; // Replace with your custom form.js URL
+        customFormScript.type = 'module';
+        customFormScript.onload = () => {
+          console.log('Custom form.js loaded successfully.');
+          customFormLoaded = true;
+        };
+        customFormScript.onerror = () => {
+          console.error('Failed to load custom form.js.');
+        };
+
+        // Insert your custom script before other scripts
+        const head = document.head || document.getElementsByTagName('head')[0];
+        head.insertBefore(customFormScript, head.firstChild);
       }
 
-      console.log('Final libs path:', libs);
       return libs;
     },
     () => libs,
   ];
 })();
-
 
 
 /*
