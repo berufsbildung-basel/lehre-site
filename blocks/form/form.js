@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config()
-// import sanitizeComment from '../../utils/sanitizeComment.js';
-// import { createTag } from '../../utils/utils.js';
+import sanitizeComment from '../../utils/sanitizeComment.js';
+import { createTag } from '../../utils/utils.js';
 
 const RULE_OPERATORS = {
   equal: '=',
