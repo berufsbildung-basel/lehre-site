@@ -13,21 +13,32 @@
 /**
  * The decision engine for where to get Milo's libs from.
  */
-export const [setLibs, getLibs] = (() => {
+ export const [setLibs, getLibs] = (() => {
   let libs;
   return [
     (prodLibs, location) => {
       libs = (() => {
         const { hostname, search } = location || window.location;
+
+        // Base library determination logic
         if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
         const branch = new URLSearchParams(search).get('milolibs') || 'main';
         if (branch === 'local') return 'http://localhost:6456/libs';
         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
       })();
+
+      // Override form.js path to use your custom file
+      if (libs.includes('blocks/form/form.js')) {
+        console.log('Intercepting form.js path');
+        libs = libs.replace('blocks/form/form.js', '/lehre-site/block/form/form.js'); // Specify your custom path here
+      }
+
       return libs;
-    }, () => libs,
+    },
+    () => libs,
   ];
 })();
+
 
 /*
  * ------------------------------------------------------------
