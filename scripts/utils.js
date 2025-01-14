@@ -19,25 +19,25 @@
     (prodLibs, location) => {
       libs = (() => {
         const { hostname, search } = location || window.location;
-
         if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
         const branch = new URLSearchParams(search).get('milolibs') || 'main';
         if (branch === 'local') return 'http://localhost:6456/libs';
         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
       })();
 
-      // Override form.js path
+      // Ensure form.js is replaced with the custom version
+      const customFormPath = 'https://github.com/berufsbildung-basel/lehre-site/blob/main/block/form/form.js'; // Replace with your custom path
       if (libs.includes('blocks/form/form.js')) {
-        console.log('Intercepting form.js path');
-        libs = libs.replace('blocks/form/form.js', '/lehre-site/block/form/form.js');
+        libs = libs.replace('blocks/form/form.js', customFormPath);
       }
 
-      console.log('Final libs path:', libs); // Log final path to verify
+      console.log('Final libs path:', libs);
       return libs;
     },
     () => libs,
   ];
 })();
+
 
 /*
  * ------------------------------------------------------------
