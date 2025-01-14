@@ -1,7 +1,3 @@
-import sanitizeComment from '../../utils/sanitizeComment.js';
-import { createTag } from '../../utils/utils.js';
-
-dotenv.config({ path: path.resolve(__dirname, './block/form/.env')})
 
 const RULE_OPERATORS = {
   equal: '=',
