@@ -15,7 +15,7 @@
  */
  export const [setLibs, getLibs] = (() => {
   let libs;
-  let customFormLoaded = false;
+  let customFormLoaded = true;
 
   return [
     (prodLibs, location) => {
