@@ -13,23 +13,19 @@
 /**
  * The decision engine for where to get Milo's libs from.
  */
- export const [setLibs, getLibs] = (() => {
+export const [setLibs, getLibs] = (() => {
   let libs;
   return [
     (prodLibs, location) => {
       libs = (() => {
         const { hostname, search } = location || window.location;
-
-        // Use your repository's base URL for libs
+        if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
         const branch = new URLSearchParams(search).get('milolibs') || 'main';
         if (branch === 'local') return 'http://localhost:6456/libs';
-        return `https://main--lehre-site--berufsbildung-basel.hlx.page/libs`;
+        return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--lehre-site--berufsbildung-basel.hlx.live/libs`;
       })();
-
-      console.log(`Final libs path: ${libs}`);
       return libs;
-    },
-    () => libs,
+    }, () => libs,
   ];
 })();
 
