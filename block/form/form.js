@@ -1,4 +1,4 @@
-import dotenv from '.env';
+import dotenv from '/block/form/.env';
 dotenv.config()
 
 const RULE_OPERATORS = {
