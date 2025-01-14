@@ -1,8 +1,0 @@
-Langmaster-Base Langmaster-v1
-para            para*
-columns         list
-
-basehash(para) - edited
-basehash(columns) - deleted
-v1hash(list) - added
-
