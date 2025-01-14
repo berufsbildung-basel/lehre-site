@@ -44,17 +44,17 @@ function constructPayload(form) {
 }
 
 async function submitForm(form) {
-  const payload = constructPayload(form); // Convert form data to JSON
-  payload.timestamp = new Date().toISOString(); // Add a timestamp to the payload
+  const payload = constructPayload(form); 
+  payload.timestamp = new Date().toISOString(); 
 
   try {
-    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', { // Replace with your Cloudflare Worker URL
+    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', { 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': process.env.API_KEY, // Secure API key to authenticate the request
+        'Authorization': process.env.API_KEY, 
       },
-      body: JSON.stringify(payload), // Convert payload to JSON string
+      body: JSON.stringify(payload), 
     });
 
     if (!response.ok) {
@@ -62,7 +62,7 @@ async function submitForm(form) {
     }
 
     const result = await response.json();
-    return result; // Use the response in the frontend as needed
+    return result; 
   } catch (error) {
     console.error('Form submission failed:', error);
     return { status: 'error', message: error.message };
