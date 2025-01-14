@@ -13,8 +13,10 @@
 /**
  * The decision engine for where to get Milo's libs from.
  */
-export const [setLibs, getLibs] = (() => {
+ export const [setLibs, getLibs] = (() => {
   let libs;
+  let customFormLoaded = false;
+
   return [
     (prodLibs, location) => {
       libs = (() => {
@@ -24,10 +26,31 @@ export const [setLibs, getLibs] = (() => {
         if (branch === 'local') return 'http://localhost:6456/libs';
         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
       })();
+
+      // Load custom form.js before the library one
+      if (!customFormLoaded) {
+        const customFormScript = document.createElement('script');
+        customFormScript.src = 'https://github.com/berufsbildung-basel/lehre-site/blob/main/block/form/form.js'; // Replace with your custom form.js URL
+        customFormScript.type = 'module';
+        customFormScript.onload = () => {
+          console.log('Custom form.js loaded successfully.');
+          customFormLoaded = true;
+        };
+        customFormScript.onerror = () => {
+          console.error('Failed to load custom form.js.');
+        };
+
+        // Insert your custom script before other scripts
+        const head = document.head || document.getElementsByTagName('head')[0];
+        head.insertBefore(customFormScript, head.firstChild);
+      }
+
       return libs;
-    }, () => libs,
+    },
+    () => libs,
   ];
 })();
+
 
 /*
  * ------------------------------------------------------------
