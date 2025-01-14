@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-import path from 'path'
 import sanitizeComment from '../../utils/sanitizeComment.js';
 import { createTag } from '../../utils/utils.js';
 
