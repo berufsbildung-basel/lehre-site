@@ -13,11 +13,8 @@
 /**
  * The decision engine for where to get Milo's libs from.
  */
- 
  export const [setLibs, getLibs] = (() => {
   let libs;
-  let customFormLoaded = false;
-
   return [
     (prodLibs, location) => {
       libs = (() => {
@@ -25,40 +22,13 @@
         if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
         const branch = new URLSearchParams(search).get('milolibs') || 'main';
         if (branch === 'local') return 'http://localhost:6456/libs';
-        return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
-      })();
-
-      // Load custom form.js
-      if (!customFormLoaded) {
-        const customFormScript = document.createElement('script');
-        customFormScript.src = 'https://main--lehre-site--berufsbildung-basel.hlx.page/block/form/form.js'; // Replace with your custom form.js URL
-        customFormScript.type = 'module';
-        customFormScript.onload = () => {
-          console.log('Custom form.js loaded successfully.');
-          customFormLoaded = true;
-        };
-        customFormScript.onerror = () => {
-          console.error('Failed to load custom form.js.');
-        };
-
-        // Insert your custom script into the document head
-        const head = document.head || document.getElementsByTagName('head')[0];
-        head.insertBefore(customFormScript, head.firstChild);
-      }
-
-      // Intercept and block Milo library's form.js
-      const originalAppendChild = document.head.appendChild.bind(document.head);
-      document.head.appendChild = (element) => {
-        if (
-          element.tagName === 'SCRIPT' &&
-          element.src.includes('/libs/blocks/form/form.js')
-        ) {
-          console.warn('Blocked loading Milo library form.js');
-          return null;
+        if (hostname.includes('lehre-site--berufsbildung-basel')) {
+          return `https://${branch}--lehre-site--berufsbildung-basel.hlx.page/libs`;
         }
-        return originalAppendChild(element);
-      };
-
+        return branch.includes('--')
+          ? `https://${branch}.hlx.live/libs`
+          : `https://${branch}--milo--adobecom.hlx.live/libs`;
+      })();
       return libs;
     },
     () => libs,
