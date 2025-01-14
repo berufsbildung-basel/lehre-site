@@ -30,7 +30,7 @@
       // Load custom form.js before the library one
       if (!customFormLoaded) {
         const customFormScript = document.createElement('script');
-        customFormScript.src = 'https://main--lehre-site--berufsbildung-basel.hlx.page/block/form/form.js'; // Replace with your custom form.js URL
+        customFormScript.src = 'https://main--lehre-site--berufsbildung-basel.hlx.live/block/form/form.js'; // Replace with your custom form.js URL
         customFormScript.type = 'module';
         customFormScript.onload = () => {
           console.log('Custom form.js loaded successfully.');
