@@ -1,5 +1,3 @@
-// import dotenv from 'dotenv';
-// dotenv.config();
 import sanitizeComment from '../../utils/sanitizeComment.js';
 import { createTag } from '../../utils/utils.js';
 
@@ -52,7 +50,6 @@ async function submitForm(form) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': "Y+IAXdbNFHyt/ihRsUZFP3fYKwATZ4QzAbiQrLsyWrw=", 
       },
       body: JSON.stringify(payload), 
     });
@@ -76,6 +73,26 @@ async function submitForm(form) {
     return { status: 'error', message: error.message };
   }
 }
+
+
+// function loadTurnstile() {
+//   const script = document.createElement('script');
+//   script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+//   script.async = true;
+//   script.onload = () => {
+//     turnstile.render('#captcha-container', {
+//       sitekey: '0x4AAAAAAA6uqp_nGspHkBq3',
+//       callback: (token) => {
+//         console.log('CAPTCHA Token received:', token);
+//         document.querySelector('#cf-turnstile-response').value = token;
+//       }
+//     });
+//   };
+//   document.body.appendChild(script);
+// }
+
+// document.addEventListener('DOMContentLoaded', loadTurnstile);
+
 
 function clearForm(form) {
   [...form.elements].forEach((fe) => {
