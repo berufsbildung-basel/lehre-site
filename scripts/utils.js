@@ -13,23 +13,6 @@
 /**
  * The decision engine for where to get Milo's libs from.
  */
-
-// export const [setLibs, getLibs] = (() => {
-//   let libs;
-//   return [
-//     (prodLibs, location) => {
-//       libs = (() => {
-//         const { hostname, search } = location || window.location;
-//         if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
-//         const branch = new URLSearchParams(search).get('milolibs') || 'main';
-//         if (branch === 'local') return 'http://localhost:6456/libs';
-//         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--apprentice-milo--t0risutan.hlx.live/libs`;
-//       })();
-//       return libs;
-//     }, () => libs,
-//   ];
-// })();
-
 // export const [setLibs, getLibs] = (() => {
 //   let libs;
 //   return [
@@ -52,24 +35,21 @@ export const [setLibs, getLibs] = (() => {
     (prodLibs, location) => {
       libs = (() => {
         const { hostname, search } = location || window.location;
-        if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
-
         const branch = new URLSearchParams(search).get('milolibs') || 'main';
+        
+        if (!(hostname.includes('.hlx.') || hostname.includes('local'))) {
+          return prodLibs; // Use production libraries
+        }
 
-        // Local development
         if (branch === 'local') return 'http://localhost:6456/libs';
 
-        // Default Milo repository
-        const miloLibs = branch.includes('--') 
-          ? `https://${branch}.hlx.live/libs` 
-          : `https://${branch}--milo--adobecom.hlx.live/libs`;
+        // Determine repo source dynamically
+        const repo = branch.includes('lehre-site') 
+          ? 'lehre-site--berufsbildung-basel' 
+          : 'milo--adobecom';
 
-        // Custom repository (lehre-site)
-        const customLibs = `https://${branch}--lehre-site--berufsbildung-basel.hlx.live/libs`;
-
-        return [miloLibs, customLibs]; // Returns an array of library sources
+        return `https://${branch}--${repo}.hlx.live/libs`;
       })();
-
       return libs;
     }, 
     () => libs,
@@ -97,7 +77,7 @@ export function decorateArea(area = document) {
       eagerLoad(document, 'img');
       return;
     }
-
+  
     // First image of first row
     eagerLoad(marquee, 'div:first-child img');
     // Last image of last column of last row
