@@ -30,6 +30,22 @@
 //   ];
 // })();
 
+// export const [setLibs, getLibs] = (() => {
+//   let libs;
+//   return [
+//     (prodLibs, location) => {
+//       libs = (() => {
+//         const { hostname, search } = location || window.location;
+//         if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
+//         const branch = new URLSearchParams(search).get('milolibs') || 'main';
+//         if (branch === 'local') return 'http://localhost:6456/libs';
+//         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
+//       })();
+//       return libs;
+//     }, () => libs,
+//   ];
+// })();
+
 export const [setLibs, getLibs] = (() => {
   let libs;
   return [
@@ -37,14 +53,29 @@ export const [setLibs, getLibs] = (() => {
       libs = (() => {
         const { hostname, search } = location || window.location;
         if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
+
         const branch = new URLSearchParams(search).get('milolibs') || 'main';
+
+        // Local development
         if (branch === 'local') return 'http://localhost:6456/libs';
-        return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
+
+        // Default Milo repository
+        const miloLibs = branch.includes('--') 
+          ? `https://${branch}.hlx.live/libs` 
+          : `https://${branch}--milo--adobecom.hlx.live/libs`;
+
+        // Custom repository (lehre-site)
+        const customLibs = `https://${branch}--lehre-site--berufsbildung-basel.hlx.live/libs`;
+
+        return [miloLibs, customLibs]; // Returns an array of library sources
       })();
+
       return libs;
-    }, () => libs,
+    }, 
+    () => libs,
   ];
 })();
+
 
 /*
  * ------------------------------------------------------------
@@ -66,7 +97,7 @@ export function decorateArea(area = document) {
       eagerLoad(document, 'img');
       return;
     }
-  
+
     // First image of first row
     eagerLoad(marquee, 'div:first-child img');
     // Last image of last column of last row
