@@ -1,4 +1,5 @@
-import sanitizeComment from '../../utils/sanitizeComment.js';
+// import sanitizeComment from '../../utils/sanitizeComment.js';
+// eslint-disable-next-line import/named
 import { createTag } from '../../scripts/utils.js';
 
 const RULE_OPERATORS = {
@@ -42,16 +43,16 @@ function constructPayload(form) {
 }
 
 async function submitForm(form) {
-  const payload = constructPayload(form); 
-  payload.timestamp = new Date().toISOString(); 
+  const payload = constructPayload(form);
+  payload.timestamp = new Date().toISOString();
 
   try {
-    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', { 
+    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload), 
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
@@ -67,7 +68,7 @@ async function submitForm(form) {
 
     const result = await response.json();
     console.log('Response from server:', result); // Log the server response
-    return result; 
+    return result;
   } catch (error) {
     console.error('Form submission failed:', error);
     return { status: 'error', message: error.message };
