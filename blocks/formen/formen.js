@@ -1,4 +1,5 @@
-// import sanitizeComment from '../../utils/sanitizeComment.js';
+import sanitizeComment from '../../utils/sanitizeComment.js';
+import { createTag } from '../../scripts/utils.js';
 
 const RULE_OPERATORS = {
   equal: '=',
