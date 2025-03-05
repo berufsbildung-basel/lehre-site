@@ -13,49 +13,22 @@
 /**
  * The decision engine for where to get Milo's libs from.
  */
-// export const [setLibs, getLibs] = (() => {
-//   let libs;
-//   return [
-//     (prodLibs, location) => {
-//       libs = (() => {
-//         const { hostname, search } = location || window.location;
-//         if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
-//         const branch = new URLSearchParams(search).get('milolibs') || 'main';
-//         if (branch === 'local') return 'http://localhost:6456/libs';
-//         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
-//       })();
-//       return libs;
-//     }, () => libs,
-//   ];
-// })();
 
-export const [setLibs, getLibs] = (() => {
-  let libs;
-  return [
-    (prodLibs, location) => {
-      libs = (() => {
-        const { hostname, search } = location || window.location;
-        const branch = new URLSearchParams(search).get('milolibs') || 'main';
-        
-        if (!(hostname.includes('.hlx.') || hostname.includes('local'))) {
-          return prodLibs; // Use production libraries
-        }
-
-        if (branch === 'local') return 'http://localhost:6456/libs';
-
-        // Determine repo source dynamically
-        const repo = branch.includes('lehre-site') 
-          ? 'lehre-site--berufsbildung-basel' 
-          : 'milo--adobecom';
-
-        return `https://${branch}--${repo}.hlx.live/libs`;
-      })();
-      return libs;
-    }, 
-    () => libs,
-  ];
-})();
-
+ export const [setLibs, getLibs] = (() => {
+   let libs;
+   return [
+     (prodLibs, location) => {
+       libs = (() => {
+         const { hostname, search } = location || window.location;
+         if (!(hostname.includes('.hlx.') || hostname.includes('local'))) return prodLibs;
+         const branch = new URLSearchParams(search).get('milolibs') || 'main';
+         if (branch === 'local') return 'http://localhost:6456/libs';
+         return branch.includes('--') ? `https://${branch}.hlx.live/libs` : `https://${branch}--milo--adobecom.hlx.live/libs`;
+       })();
+       return libs;
+     }, () => libs,
+   ];
+ })();
 
 /*
  * ------------------------------------------------------------
