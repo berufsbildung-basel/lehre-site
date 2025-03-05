@@ -46,7 +46,7 @@ async function submitForm(form) {
   payload.timestamp = new Date().toISOString(); 
 
   try {
-    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', { 
+    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ async function submitForm(form) {
 
     const result = await response.json();
     console.log('Response from server:', result); // Log the server response
-    return result; 
+    return result;
   } catch (error) {
     console.error('Form submission failed:', error);
     return { status: 'error', message: error.message };
