@@ -14,6 +14,43 @@ const RULE_OPERATORS = {
 const miloLibs = getLibs();
 const {createTag} = await import(`${miloLibs}/utils/utils.js`);
 
+// function loadTurnstile() {
+//     if (!document.getElementById('cf-turnstile-script')) {
+//         const script = document.createElement('script');
+//         script.id = 'cf-turnstile-script';
+//         script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+//         script.async = true;
+//         script.defer = true;
+//         document.head.appendChild(script);
+//     }
+// }
+
+function setupFormHandler() {
+    const form = document.querySelector('form');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    submitButton.disabled = true;
+
+    function captchaSolved(token) {
+        console.log("Captcha solved! Token:", token);
+        submitButton.disabled = false;
+    }
+
+    const turnstileDiv = document.createElement('div');
+    turnstileDiv.classList.add('cd-trunstile');
+    turnstileDiv.setAttribute('data-sitekey', 'my-site-key');
+    turnstileDiv.setAttribute('data-callback', 'captchaSolved');
+
+    form.insertBefore(turnstileDiv, submitButton);
+
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+    script.async = true;
+    document.body.appendChild(script);
+}
+
+document.addEventListener("DOMContentLoaded", setupFormHandler);
+
 function createSelect({ field, placeholder, options, defval, required }) {
   const select = createTag('select', { id: field });
   if (placeholder) select.append(createTag('option', { selected: '', disabled: '' }, placeholder));
