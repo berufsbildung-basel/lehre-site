@@ -15,7 +15,7 @@ const miloLibs = getLibs();
 const {createTag} = await import(`${miloLibs}/utils/utils.js`);
 
 function setupFormHandler() {
-    const form = document.querySelector('form');
+    const form = document.querySelector('formen');
     const submitButton = form.querySelector('button[type="submit"]');
 
     submitButton.disabled = true;
@@ -27,7 +27,7 @@ function setupFormHandler() {
 
     const turnstileDiv = document.createElement('div');
     turnstileDiv.classList.add('cd-trunstile');
-    turnstileDiv.setAttribute('data-sitekey', 'my-site-key');
+    turnstileDiv.setAttribute('data-sitekey', '0x4AAAAAAA6uqp_nGspHkBq3');
     turnstileDiv.setAttribute('data-callback', 'captchaSolved');
 
     form.insertBefore(turnstileDiv, submitButton);
