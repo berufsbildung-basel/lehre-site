@@ -14,31 +14,17 @@ const RULE_OPERATORS = {
 const miloLibs = getLibs();
 const {createTag} = await import(`${miloLibs}/utils/utils.js`);
 
-function setupFormHandler() {
-    const form = document.querySelector('formen');
-    const submitButton = form.querySelector('button[type="submit"]');
-
-    submitButton.disabled = true;
-
-    function captchaSolved(token) {
-        console.log("Captcha solved! Token:", token);
-        submitButton.disabled = false;
+function loadTurnstile() {
+    if (!document.getElementById('cf-turnstile-script')) {
+        const script = document.createElement('script');
+        script.id = 'cf-turnstile-script';
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
     }
-
-    const turnstileDiv = document.createElement('div');
-    turnstileDiv.classList.add('cd-trunstile');
-    turnstileDiv.setAttribute('data-sitekey', '0x4AAAAAAA6uqp_nGspHkBq3');
-    turnstileDiv.setAttribute('data-callback', 'captchaSolved');
-
-    form.insertBefore(turnstileDiv, submitButton);
-
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
-    script.async = true;
-    document.body.appendChild(script);
 }
-
-document.addEventListener("DOMContentLoaded", setupFormHandler);
+loadTurnstile();
 
 function createSelect({ field, placeholder, options, defval, required }) {
   const select = createTag('select', { id: field });
@@ -114,38 +100,62 @@ function clearForm(form) {
 
 function createButton({ type, label }, thankYou) {
   const button = createTag('button', { class: 'button' }, label);
+
   if (type === 'submit') {
     button.addEventListener('click', async (event) => {
       const form = button.closest('form');
+
       if (form.checkValidity()) {
         event.preventDefault();
+
+        if (!form.querySelector('.cf-turnstile')) {
+          const captchaDiv = createTag('div', { class: 'cf-turnstile' });
+          form.appendChild(captchaDiv);
+
+          turnstile.render(captchaDiv, {
+            sitekey: '0x4AAAAAAA6uqp_nGspHkBq3', // Replace with your actual sitekey
+            theme: 'light',
+            callback: async (token) => {
+              console.log('Turnstile token:', token);
+              form.dataset.turnstileToken = token; // Store token in form dataset
+              button.removeAttribute('disabled');
+            }
+          });
+
+          button.setAttribute('disabled', 'true'); // Disable until captcha is solved
+          return;
+        }
+
+        const token = form.dataset.turnstileToken;
+        if (!token) {
+          console.error('Captcha not completed');
+          return;
+        }
+
         button.setAttribute('disabled', '');
-        const submission = await submitForm(form);
+        const payload = constructPayload(form);
+        payload.turnstileToken = token; // Include Turnstile token
+
+        const submission = await submitForm(payload);
         button.removeAttribute('disabled');
+        
         if (!submission) return;
         clearForm(form);
+        
         const handleThankYou = thankYou.querySelector('a') ? thankYou.querySelector('a').href : thankYou.innerHTML;
         if (!thankYou.innerHTML.includes('href')) {
           const thanksText = createTag('h4', { class: 'thank-you' }, handleThankYou);
           form.append(thanksText);
           setTimeout(() => thanksText.remove(), 2000);
-          /* c8 ignore next 3 */
         } else {
           window.location.href = handleThankYou;
         }
       }
     });
   }
-  if (type === 'clear') {
-    button.classList.add('outline');
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      const form = button.closest('form');
-      clearForm(form);
-    });
-  }
   return button;
 }
+
 
 function createHeading({ label }, el) {
   return createTag(el, {}, label);
