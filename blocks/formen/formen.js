@@ -55,24 +55,26 @@ function constructPayload(form) {
   return payload;
 }
 
-async function submitForm(form) {
-  const payload = constructPayload(form); 
-  payload.timestamp = new Date().toISOString(); 
+async function submitForm(formOrPayload) {
+  const payload = formOrPayload instanceof HTMLFormElement
+    ? constructPayload(formOrPayload)
+    : formOrPayload;
+
+  payload.timestamp = new Date().toISOString();
 
   try {
-    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', { 
+    const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload), 
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
 
-    // Log success message to the console
     console.log('POST request successful:', {
       status: response.status,
       statusText: response.statusText,
@@ -80,8 +82,8 @@ async function submitForm(form) {
     });
 
     const result = await response.json();
-    console.log('Response from server:', result); // Log the server response
-    return result; 
+    console.log('Response from server:', result);
+    return result;
   } catch (error) {
     console.error('Form submission failed:', error);
     return { status: 'error', message: error.message };
@@ -111,20 +113,20 @@ function createButton({ type, label }, thankYou) {
         if (!form.querySelector('.cf-turnstile')) {
           const captchaDiv = createTag('div', { class: 'cf-turnstile' });
           form.appendChild(captchaDiv);
-
+        
           turnstile.render(captchaDiv, {
-            sitekey: '0x4AAAAAAA6uqp_nGspHkBq3', // Replace with your actual sitekey
+            sitekey: '0x4AAAAAAA6uqp_nGspHkBq3',
             theme: 'light',
             callback: async (token) => {
               console.log('Turnstile token:', token);
-              form.dataset.turnstileToken = token; // Store token in form dataset
+              form.dataset.turnstileToken = token;
               button.removeAttribute('disabled');
             }
           });
-
-          button.setAttribute('disabled', 'true'); // Disable until captcha is solved
+        
+          button.setAttribute('disabled', 'true');
           return;
-        }
+        }        
 
         const token = form.dataset.turnstileToken;
         if (!token) {
