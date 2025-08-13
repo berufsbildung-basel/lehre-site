@@ -41,7 +41,16 @@ function createSelect({ field, placeholder, options, defval, required }) {
 
 function constructPayload(form) {
   const payload = {};
+  const files = {};
+  
   [...form.elements].filter((el) => el.tagName !== 'BUTTON').forEach((fe) => {
+    if (fe.type === 'file') {
+      if (fe.files && fe.files.length > 0) {
+        files[fe.id] = Array.from(fe.files);
+      }
+      return;
+    }
+    
     if (fe.type.match(/(?:checkbox|radio)/)) {
       if (fe.checked) {
         payload[fe.name] = payload[fe.name] ? `${fe.value}, ${payload[fe.name]}` : fe.value;
@@ -52,23 +61,48 @@ function constructPayload(form) {
     }
     payload[fe.id] = fe.value;
   });
-  return payload;
+  
+  return { payload, files };
 }
 
 async function submitForm(formOrPayload) {
-  const payload = formOrPayload instanceof HTMLFormElement
-    ? constructPayload(formOrPayload)
-    : formOrPayload;
+  let payload, files;
+  
+  if (formOrPayload instanceof HTMLFormElement) {
+    const formData = constructPayload(formOrPayload);
+    payload = formData.payload;
+    files = formData.files;
+  } else {
+    payload = formOrPayload;
+    files = {};
+  }
 
   payload.timestamp = new Date().toISOString();
 
   try {
+    // Create FormData for multipart form submission
+    const formData = new FormData();
+    
+    // Add regular form fields
+    Object.keys(payload).forEach(key => {
+      formData.append(key, payload[key]);
+    });
+    
+    // Add files
+    Object.keys(files).forEach(fieldName => {
+      files[fieldName].forEach((file, index) => {
+        formData.append(`${fieldName}_${index}`, file, file.name);
+      });
+    });
+    
+    // Add file count metadata
+    Object.keys(files).forEach(fieldName => {
+      formData.append(`${fieldName}_count`, files[fieldName].length.toString());
+    });
+
     const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
+      body: formData, // No Content-Type header - browser will set it with boundary
     });
 
     if (!response.ok) {
@@ -79,6 +113,7 @@ async function submitForm(formOrPayload) {
       status: response.status,
       statusText: response.statusText,
       payload,
+      fileCount: Object.keys(files).reduce((count, key) => count + files[key].length, 0)
     });
 
     const result = await response.json();
@@ -106,7 +141,24 @@ function createButton({ type, label }, thankYou) {
   if (type === 'submit') {
     button.addEventListener('click', async (event) => {
       const form = button.closest('form');
+      const currentStep = parseInt(form.dataset.currentStep || '1');
+      const totalSteps = getTotalSteps(form);
 
+      // Validate current step before proceeding
+      if (!validateCurrentStep(form, currentStep)) {
+        event.preventDefault();
+        return;
+      }
+
+      // If not on last step, validate and navigate to next step
+      if (currentStep < totalSteps) {
+        event.preventDefault();
+        saveFormDataToSession(form);
+        navigateStep(form, currentStep + 1);
+        return;
+      }
+
+      // Final step submission
       if (form.checkValidity()) {
         event.preventDefault();
 
@@ -135,14 +187,17 @@ function createButton({ type, label }, thankYou) {
         }
 
         button.setAttribute('disabled', '');
-        const payload = constructPayload(form);
-        payload.turnstileToken = token; // Include Turnstile token
+        const formData = constructPayload(form);
+        formData.payload.turnstileToken = token; // Include Turnstile token
 
-        const submission = await submitForm(payload);
+        const submission = await submitForm(form);
         button.removeAttribute('disabled');
         
         if (!submission) return;
         clearForm(form);
+        
+        // Clear session storage after successful submission
+        sessionStorage.removeItem(`formData_${form.dataset.action}`);
         
         const handleThankYou = thankYou.querySelector('a') ? thankYou.querySelector('a').href : thankYou.innerHTML;
         if (!thankYou.innerHTML.includes('href')) {
@@ -167,6 +222,194 @@ function createInput({ type, field, placeholder, required, defval }) {
   const input = createTag('input', { type, id: field, placeholder, value: defval });
   if (required === 'x') input.setAttribute('required', 'required');
   return input;
+}
+
+function createFileInput({ field, required, placeholder }) {
+  const wrapper = createTag('div', { class: 'file-upload-wrapper' });
+  const input = createTag('input', { type: 'file', id: field, multiple: true, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif' });
+  if (required === 'x') input.setAttribute('required', 'required');
+  
+  const dropZone = createTag('div', { class: 'file-drop-zone' });
+  const attachButton = createTag('button', { type: 'button', class: 'attach-file-btn' }, 'Attach file');
+  const dropText = createTag('span', { class: 'drop-text' }, 'Drop files here');
+  
+  dropZone.append(attachButton, dropText);
+  
+  // File list display
+  const fileList = createTag('div', { class: 'file-list' });
+  
+  // Click to select files
+  attachButton.addEventListener('click', () => input.click());
+  
+  // Drag and drop functionality
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+  
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('drag-over');
+  });
+  
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    input.files = e.dataTransfer.files;
+    updateFileList();
+  });
+  
+  function updateFileList() {
+    fileList.innerHTML = '';
+    Array.from(input.files).forEach((file, index) => {
+      const fileItem = createTag('div', { class: 'file-item' });
+      const fileName = createTag('span', { class: 'file-name' }, file.name);
+      const fileSize = createTag('span', { class: 'file-size' }, formatFileSize(file.size));
+      const removeBtn = createTag('button', { type: 'button', class: 'remove-file' }, '×');
+      
+      removeBtn.addEventListener('click', () => {
+        const dt = new DataTransfer();
+        Array.from(input.files).forEach((f, i) => {
+          if (i !== index) dt.items.add(f);
+        });
+        input.files = dt.files;
+        updateFileList();
+      });
+      
+      fileItem.append(fileName, fileSize, removeBtn);
+      fileList.append(fileItem);
+    });
+  }
+  
+  input.addEventListener('change', updateFileList);
+  
+  wrapper.append(input, dropZone, fileList);
+  return wrapper;
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function createStepIndicator(totalSteps, currentStep) {
+  const wrapper = createTag('div', { class: 'step-indicator' });
+  const progressLine = createTag('div', { class: 'progress-line' });
+  const progressFill = createTag('div', { class: 'progress-fill' });
+  progressLine.append(progressFill);
+  
+  const stepsWrapper = createTag('div', { class: 'steps-wrapper' });
+  
+  for (let i = 1; i <= totalSteps; i++) {
+    const step = createTag('div', { class: `step ${i <= currentStep ? 'active' : ''}` });
+    const stepNumber = createTag('span', { class: 'step-number' }, i.toString());
+    step.append(stepNumber);
+    stepsWrapper.append(step);
+  }
+  
+  wrapper.append(progressLine, stepsWrapper);
+  return wrapper;
+}
+
+function createStepNavigation(currentStep, totalSteps, formElement) {
+  const wrapper = createTag('div', { class: 'step-navigation' });
+  
+  if (currentStep > 1) {
+    const backBtn = createTag('button', { type: 'button', class: 'step-btn step-back' }, 'Zurück');
+    backBtn.addEventListener('click', () => navigateStep(formElement, currentStep - 1));
+    wrapper.append(backBtn);
+  }
+  
+  if (currentStep < totalSteps) {
+    const nextBtn = createTag('button', { type: 'button', class: 'step-btn step-next' }, 'Weiter');
+    nextBtn.addEventListener('click', () => {
+      if (validateCurrentStep(formElement, currentStep)) {
+        saveFormDataToSession(formElement);
+        navigateStep(formElement, currentStep + 1);
+      }
+    });
+    wrapper.append(nextBtn);
+  }
+  
+  return wrapper;
+}
+
+function navigateStep(form, targetStep) {
+  // Hide all steps
+  form.querySelectorAll('.form-step').forEach(step => {
+    step.style.display = 'none';
+  });
+  
+  // Show target step
+  const targetStepElement = form.querySelector(`[data-step="${targetStep}"]`);
+  if (targetStepElement) {
+    targetStepElement.style.display = 'block';
+  }
+  
+  // Update step indicator
+  const indicator = form.querySelector('.step-indicator');
+  if (indicator) {
+    const steps = indicator.querySelectorAll('.step');
+    steps.forEach((step, index) => {
+      step.classList.toggle('active', index < targetStep);
+    });
+    
+    const progressFill = indicator.querySelector('.progress-fill');
+    const progressPercent = ((targetStep - 1) / (steps.length - 1)) * 100;
+    progressFill.style.width = `${progressPercent}%`;
+  }
+  
+  // Update navigation
+  const navigation = form.querySelector('.step-navigation');
+  if (navigation) {
+    navigation.replaceWith(createStepNavigation(targetStep, getTotalSteps(form), form));
+  }
+  
+  // Store current step
+  form.dataset.currentStep = targetStep;
+}
+
+function validateCurrentStep(form, step) {
+  const stepElement = form.querySelector(`[data-step="${step}"]`);
+  const requiredFields = stepElement.querySelectorAll('[required]');
+  
+  let valid = true;
+  requiredFields.forEach(field => {
+    if (!field.checkValidity()) {
+      field.reportValidity();
+      valid = false;
+    }
+  });
+  
+  return valid;
+}
+
+function getTotalSteps(form) {
+  return form.querySelectorAll('.form-step').length;
+}
+
+function saveFormDataToSession(form) {
+  const formData = constructPayload(form);
+  sessionStorage.setItem(`formData_${form.dataset.action}`, JSON.stringify(formData));
+}
+
+function loadFormDataFromSession(form) {
+  const savedData = sessionStorage.getItem(`formData_${form.dataset.action}`);
+  if (savedData) {
+    const data = JSON.parse(savedData);
+    Object.keys(data).forEach(key => {
+      const field = form.querySelector(`#${key}`);
+      if (field && field.type !== 'file') {
+        if (field.type === 'checkbox' || field.type === 'radio') {
+          field.checked = data[key].includes(field.value);
+        } else {
+          field.value = data[key];
+        }
+      }
+    });
+  }
 }
 
 function createTextArea({ field, placeholder, required, defval }) {
@@ -296,38 +539,96 @@ async function createForm(formURL, thankYou, formData) {
     'checkbox-group': { fn: createCheckGroup, params: ['checkbox'], label: true, classes: ['field-group-wrapper'] },
     'radio-group': { fn: createCheckGroup, params: ['radio'], label: true, classes: ['field-group-wrapper'] },
     'text-area': { fn: createTextArea, params: [], label: true, classes: [] },
+    file: { fn: createFileInput, params: [], label: true, classes: ['field-file-wrapper'] },
     submit: { fn: createButton, params: [thankYou], label: false, classes: ['field-button-wrapper'] },
     clear: { fn: createButton, params: [thankYou], label: false, classes: ['field-button-wrapper'] },
     default: { fn: createInput, params: [], label: true, classes: [] },
   };
 
+  // Group fields by steps if extra contains step info
+  const steps = {};
+  let currentStepData = null;
+  let stepCounter = 1;
+  
   json.data.forEach((fd) => {
     fd.type = fd.type || 'text';
-    const style = fd.extra ? ` form-${fd.extra}` : '';
-    const fieldWrapper = createTag(
-      'div',
-      { class: `field-wrapper form-${fd.type}-wrapper${style}`, 'data-field-id': fd.field, 'data-type': fd.type },
-    );
-
-    const elParams = typeToElement[fd.type] || typeToElement.default;
-    if (elParams.label) fieldWrapper.append(createlabel(fd));
-    fieldWrapper.append(elParams.fn(fd, ...elParams.params));
-    fieldWrapper.classList.add(...elParams.classes);
-
-    if (fd.rules?.length) {
-      try {
-        rules.push({ fieldId: fd.field, rule: JSON.parse(fd.rules) });
-        /* c8 ignore next 4 */
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.warn(`Invalid Rule ${fd.rules}: ${e}`);
-      }
+    
+    // Determine step based on extra field or position
+    let stepNumber = 1;
+    if (fd.extra && fd.extra.includes('step-')) {
+      stepNumber = parseInt(fd.extra.match(/step-(\d+)/)[1]) || stepCounter;
+    } else if (currentStepData && currentStepData.stepNumber) {
+      stepNumber = currentStepData.stepNumber;
+    } else {
+      stepNumber = stepCounter;
     }
-    form.append(fieldWrapper);
+    
+    if (!steps[stepNumber]) {
+      steps[stepNumber] = [];
+      stepCounter = stepNumber + 1;
+    }
+    
+    currentStepData = { stepNumber, field: fd };
+    steps[stepNumber].push(fd);
   });
+  
+  const totalSteps = Object.keys(steps).length;
+  
+  // Create step indicator if more than one step
+  if (totalSteps > 1) {
+    form.append(createStepIndicator(totalSteps, 1));
+  }
+  
+  // Create steps
+  Object.keys(steps).forEach((stepNum) => {
+    const stepNumber = parseInt(stepNum);
+    const stepWrapper = createTag('div', { 
+      class: 'form-step', 
+      'data-step': stepNumber,
+      style: stepNumber === 1 ? 'block' : 'none'
+    });
+    
+    steps[stepNum].forEach((fd) => {
+      const style = fd.extra ? ` form-${fd.extra}` : '';
+      const fieldWrapper = createTag(
+        'div',
+        { class: `field-wrapper form-${fd.type}-wrapper${style}`, 'data-field-id': fd.field, 'data-type': fd.type },
+      );
+
+      const elParams = typeToElement[fd.type] || typeToElement.default;
+      if (elParams.label) fieldWrapper.append(createlabel(fd));
+      fieldWrapper.append(elParams.fn(fd, ...elParams.params));
+      fieldWrapper.classList.add(...elParams.classes);
+
+      if (fd.rules?.length) {
+        try {
+          rules.push({ fieldId: fd.field, rule: JSON.parse(fd.rules) });
+          /* c8 ignore next 4 */
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.warn(`Invalid Rule ${fd.rules}: ${e}`);
+        }
+      }
+      stepWrapper.append(fieldWrapper);
+    });
+    
+    // Add step navigation if more than one step
+    if (totalSteps > 1) {
+      stepWrapper.append(createStepNavigation(stepNumber, totalSteps, form));
+    }
+    
+    form.append(stepWrapper);
+  });
+  
+  // Set initial step
+  form.dataset.currentStep = '1';
 
   form.addEventListener('input', () => applyRules(form, rules));
   applyRules(form, rules);
+  
+  // Load saved form data from session if available
+  loadFormDataFromSession(form);
+  
   return form;
 }
 
