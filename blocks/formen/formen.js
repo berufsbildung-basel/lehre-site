@@ -327,6 +327,8 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+// the steps arent properly implemented yet, due to there only being the one single page on the form page
+
 function createStepIndicator(totalSteps, currentStep) {
   const wrapper = createTag('div', { class: 'step-indicator' });
   const progressLine = createTag('div', { class: 'progress-line' });
@@ -370,7 +372,7 @@ function createStepNavigation(currentStep, totalSteps, formElement) {
 }
 
 function navigateStep(form, targetStep) {
-  // Hide all steps
+  // hides the steps
   form.querySelectorAll('.form-step').forEach(step => {
     step.style.display = 'none';
   });
@@ -381,7 +383,7 @@ function navigateStep(form, targetStep) {
     targetStepElement.style.display = 'block';
   }
   
-  // Update step indicator
+  // updates the step indicator as in showing the current step you are currently on and the progress bar
   const indicator = form.querySelector('.step-indicator');
   if (indicator) {
     const steps = indicator.querySelectorAll('.step');
