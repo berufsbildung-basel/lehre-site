@@ -29,6 +29,6 @@
   margin-bottom: var(--spacing-xs);
 }
 
-.card h3 {
-  margin-left: 10px;
+.card strong {
+  margin-left: 20px;
 }
