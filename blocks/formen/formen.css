@@ -377,7 +377,7 @@
     align-items: start;
   }
 
-  .formen :is(.form-submit-wrapper:last-child, .form-heading-wrapper, .thank-you, .form-full-width) {
+  .formen :is(.form-submit-wrapper:last-child, .form-heading-wrapper, .thank-you, .form-full-width, .step-indicator) {
     grid-column: 1 / 3;
     justify-self: center;
   }
@@ -613,7 +613,6 @@
 }
 
 .formen .attach-file-btn::before {
-  content: '📎';
   font-size: 16px;
 }
 
