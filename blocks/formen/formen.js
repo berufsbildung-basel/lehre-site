@@ -43,13 +43,13 @@ function constructPayload(form) {
   const payload = {};
   const files = {};
   
-  // Check all form elements
+  // checks all the form elements so it can add them to the payload after
   [...form.elements].filter((el) => el.tagName !== 'BUTTON').forEach((fe) => {
     if (fe.type === 'file') {
       if (fe.files && fe.files.length > 0) {
         files[fe.id] = Array.from(fe.files);
       }
-      return; // Don't add file inputs to regular payload
+      return; // file inputs dont get added to the regular payload
     }
     
     if (fe.type.match(/(?:checkbox|radio)/)) {
@@ -61,19 +61,19 @@ function constructPayload(form) {
       return;
     }
     
-    // Only add non-file inputs to payload
+    // makes sure that only non-file inputs get added to the payload
     if (fe.id && fe.type !== 'file') {
       payload[fe.id] = fe.value;
     }
   });
   
-  // Also check for file inputs that might not be in form.elements
+  // checks for file inputs that might not be in form.elements
   const fileInputs = form.querySelectorAll('input[type="file"]');
   
   fileInputs.forEach(input => {
     if (input.files && input.files.length > 0 && input.id) {
       files[input.id] = Array.from(input.files);
-      // Remove from payload if it was added there
+      // remove files from the payload if it was added there
       delete payload[input.id];
     }
   });
@@ -101,29 +101,29 @@ async function submitForm(formOrPayload) {
     let response;
     
     if (hasFiles) {
-      // Create FormData for multipart form submission
+      // creates FormData for multipart form submission, this is needed because the form data gets sent in json and the files need to be sent in an other format
       const formData = new FormData();
       
-      // Add regular form fields
+      // adds form fields
       Object.keys(payload).forEach(key => {
         formData.append(key, payload[key]);
       });
       
-      // Add files
+     files
       Object.keys(files).forEach(fieldName => {
         files[fieldName].forEach((file, index) => {
           formData.append(`${fieldName}_${index}`, file, file.name);
         });
       });
       
-      // Add file count metadata
+      // adds the file count in the payload of the form
       Object.keys(files).forEach(fieldName => {
         formData.append(`${fieldName}_count`, files[fieldName].length.toString());
       });
 
       response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
         method: 'POST',
-        body: formData, // No Content-Type header - browser will set it with boundary
+        body: formData,
       });
     } else {
       response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
@@ -165,6 +165,9 @@ function clearForm(form) {
   });
 }
 
+// currently the submit button works in a two step process of first loading the captcha and after the captcha you press it again to actually submit the form
+// lines 175-191 are actually meant for the multiple steps of the form application page but is currently not properly in use
+
 function createButton({ type, label }, thankYou) {
   const button = createTag('button', { class: 'button' }, label);
 
@@ -180,7 +183,7 @@ function createButton({ type, label }, thankYou) {
         return;
       }
 
-      // If not on last step, validate and navigate to next step
+      // if its not the last step it validates/ processes the current step and navigates to the next one (could also use a different method for proceeding to the next step)
       if (currentStep < totalSteps) {
         event.preventDefault();
         saveFormDataToSession(form);
@@ -188,7 +191,7 @@ function createButton({ type, label }, thankYou) {
         return;
       }
 
-      // Final step submission
+      // this is the part where the captcha is loaded after filling data out in the final step and pressing the submit button
       if (form.checkValidity()) {
         event.preventDefault();
 
@@ -218,7 +221,7 @@ function createButton({ type, label }, thankYou) {
 
         button.setAttribute('disabled', '');
         const formData = constructPayload(form);
-        formData.payload.turnstileToken = token; // Include Turnstile token
+        formData.payload.turnstileToken = token; // includes the turnstile token in the payload of the form
 
         const submission = await submitForm(form);
         button.removeAttribute('disabled');
@@ -226,9 +229,11 @@ function createButton({ type, label }, thankYou) {
         if (!submission) return;
         clearForm(form);
         
-        // Clear session storage after successful submission
+        // clears session storage after successful submission
         sessionStorage.removeItem(`formData_${form.dataset.action}`);
         
+        // might replace this with something else later on, but will leave it for now
+
         const handleThankYou = thankYou.querySelector('a') ? thankYou.querySelector('a').href : thankYou.innerHTML;
         if (!thankYou.innerHTML.includes('href')) {
           const thanksText = createTag('h4', { class: 'thank-you' }, handleThankYou);
@@ -265,13 +270,11 @@ function createFileInput({ field, required, placeholder }) {
   
   dropZone.append(attachButton, dropText);
   
-  // File list display
+  // displays the files which are attached to the form
   const fileList = createTag('div', { class: 'file-list' });
   
-  // Click to select files
   attachButton.addEventListener('click', () => input.click());
   
-  // Drag and drop functionality
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     dropZone.classList.add('drag-over');
