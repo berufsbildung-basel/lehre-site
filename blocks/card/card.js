@@ -1,6 +1,6 @@
 import { decorateButtons } from '../../utils/decorate.js';
 import { loadStyle, getConfig } from '../../utils/utils.js';
-import { addBackgroundImg, addWrapper, addFooter, addVideoBtn } from './cardsUtils.js';
+import { addBackgroundImg, addWrapper, addFooter, addVideoBtn } from './cardUtils.js';
 
 const HALF = 'OneHalfCard';
 const HALF_HEIGHT = 'HalfHeightCard';
