@@ -2,8 +2,11 @@
 import { getMetadata } from '../section-metadata/section-metadata.js' ;
 import {getLibs} from "../../scripts/scripts.js";
 
-const miloLibs = getLibs();
-const {createTag} = await import(`${miloLibs}/utils/utils.js`)
+const miloLibs = getLibs()
+const metaLibs = getLibs();
+
+const {getMetadata} = await import(`${metaLibs}/blocks/section-metadata/section-metadata.js`);
+const {createTag} = await import(`${miloLibs}/utils/utils.js`);
 
 const DOUBLE_WIDE = 'DoubleWideCard';
 const HALF_HEIGHT = 'HalfHeightCard';

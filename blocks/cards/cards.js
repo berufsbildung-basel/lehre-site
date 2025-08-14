@@ -4,8 +4,12 @@
 import { addBackgroundImg, addWrapper, addFooter, addVideoBtn } from './cardsUtils.js';
 import {getLibs} from "../../scripts/scripts.js";
 
-const miloLibs = getLibs();
-const {createTag} = await import(`${miloLibs}/utils/utils.js`);
+const miloLibs = getLibs()
+const miroLibs = getLibs()
+
+const {loadStyle} = await import(`${miloLibs}/utils/utils.js`);
+const {getConfig} = await import(`${miloLibs}/utils/utils.js`);
+const {decorateButtons} = await import(`${miroLibs}/utils/decorate.js`);
 
 const HALF = 'OneHalfCard';
 const HALF_HEIGHT = 'HalfHeightCard';
