@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { getMetadata } from '../section-metadata/section-metadata.js';
+import { getMetadata } from '../section-metadata/section-metadata.js' ;
 import {getLibs} from "../../scripts/scripts.js";
 
 const miloLibs = getLibs();
