@@ -2,9 +2,8 @@
 import {getLibs} from "../../scripts/scripts.js";
 
 const miloLibs = getLibs()
-const metaLibs = getLibs();
 
-const {getMetadata} = await import(`${metaLibs}/blocks/section-metadata/section-metadata.js`);
+const {getMetadata} = await import(`${miloLibs}/blocks/section-metadata/section-metadata.js`);
 const {createTag} = await import(`${miloLibs}/utils/utils.js`);
 
 const DOUBLE_WIDE = 'DoubleWideCard';
