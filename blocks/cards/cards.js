@@ -1,5 +1,6 @@
-import { decorateButtons } from '../../utils/decorate.js';
-import { loadStyle, getConfig } from '../../utils/utils.js';
+// import { decorateButtons } from '../../utils/decorate.js';
+// import { loadStyle, getConfig } from '../../utils/utils.js';+
+
 import { addBackgroundImg, addWrapper, addFooter, addVideoBtn } from './cardsUtils.js';
 import {getLibs} from "../../scripts/scripts.js";
 
@@ -113,3 +114,4 @@ const init = (el) => {
 };
 
 export default init;
+
