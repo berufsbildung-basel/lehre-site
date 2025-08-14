@@ -1,6 +1,10 @@
 import { decorateButtons } from '../../utils/decorate.js';
 import { loadStyle, getConfig } from '../../utils/utils.js';
 import { addBackgroundImg, addWrapper, addFooter, addVideoBtn } from './cardsUtils.js';
+import {getLibs} from "../../scripts/scripts.js";
+
+const miloLibs = getLibs();
+const {createTag} = await import(`${miloLibs}/utils/utils.js`);
 
 const HALF = 'OneHalfCard';
 const HALF_HEIGHT = 'HalfHeightCard';
