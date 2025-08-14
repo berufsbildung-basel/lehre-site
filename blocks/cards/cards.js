@@ -2,7 +2,6 @@ import { addBackgroundImg, addWrapper, addFooter, addVideoBtn } from './cardsUti
 import {getLibs} from "../../scripts/scripts.js";
 
 const miloLibs = getLibs()
-const miroLibs = getLibs()
 
 const {loadStyle, getConfig} = await import(`${miloLibs}/utils/utils.js`);
 const {decorateButtons} = await import(`${miloLibs}/utils/decorate.js`);
