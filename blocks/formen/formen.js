@@ -43,18 +43,11 @@ function constructPayload(form) {
   const payload = {};
   const files = {};
   
-  console.log('=== Debug constructPayload ===');
-  console.log('Form elements found:', form.elements.length);
-  
   // Check all form elements
   [...form.elements].filter((el) => el.tagName !== 'BUTTON').forEach((fe) => {
-    console.log(`Element: ${fe.id || fe.name}, type: ${fe.type}, tagName: ${fe.tagName}`);
-    
     if (fe.type === 'file') {
-      console.log(`File input found: ${fe.id}, files count: ${fe.files ? fe.files.length : 0}`);
       if (fe.files && fe.files.length > 0) {
         files[fe.id] = Array.from(fe.files);
-        console.log(`Added files for ${fe.id}:`, Array.from(fe.files).map(f => f.name));
       }
       return; // Don't add file inputs to regular payload
     }
@@ -71,28 +64,19 @@ function constructPayload(form) {
     // Only add non-file inputs to payload
     if (fe.id && fe.type !== 'file') {
       payload[fe.id] = fe.value;
-      console.log(`Added to payload: ${fe.id} = ${fe.value}`);
     }
   });
   
   // Also check for file inputs that might not be in form.elements
   const fileInputs = form.querySelectorAll('input[type="file"]');
-  console.log(`Found ${fileInputs.length} file inputs via querySelector`);
   
   fileInputs.forEach(input => {
-    console.log(`Direct file input check: ${input.id}, files: ${input.files ? input.files.length : 0}`);
     if (input.files && input.files.length > 0 && input.id) {
       files[input.id] = Array.from(input.files);
-      console.log(`Added files from querySelector for ${input.id}:`, Array.from(input.files).map(f => f.name));
       // Remove from payload if it was added there
       delete payload[input.id];
     }
   });
-  
-  console.log('Final payload:', payload);
-  console.log('Final files:', Object.keys(files), files);
-  console.log('Has files?', Object.keys(files).length > 0);
-  console.log('=== End Debug ===');
   
   return { payload, files };
 }
@@ -112,37 +96,29 @@ async function submitForm(formOrPayload) {
   payload.timestamp = new Date().toISOString();
   
   const hasFiles = Object.keys(files).length > 0;
-  console.log('=== Submit Form Debug ===');
-  console.log('Has files:', hasFiles);
-  console.log('Files object:', files);
-  console.log('Payload object:', payload);
 
   try {
     let response;
     
     if (hasFiles) {
-      console.log('Sending as FormData (multipart)');
       // Create FormData for multipart form submission
       const formData = new FormData();
       
       // Add regular form fields
       Object.keys(payload).forEach(key => {
         formData.append(key, payload[key]);
-        console.log(`Added to FormData: ${key} = ${payload[key]}`);
       });
       
       // Add files
       Object.keys(files).forEach(fieldName => {
         files[fieldName].forEach((file, index) => {
           formData.append(`${fieldName}_${index}`, file, file.name);
-          console.log(`Added file to FormData: ${fieldName}_${index} = ${file.name}`);
         });
       });
       
       // Add file count metadata
       Object.keys(files).forEach(fieldName => {
         formData.append(`${fieldName}_count`, files[fieldName].length.toString());
-        console.log(`Added file count: ${fieldName}_count = ${files[fieldName].length}`);
       });
 
       response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
@@ -150,7 +126,6 @@ async function submitForm(formOrPayload) {
         body: formData, // No Content-Type header - browser will set it with boundary
       });
     } else {
-      console.log('Sending as JSON (no files)');
       response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
         method: 'POST',
         headers: {
