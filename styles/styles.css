@@ -6,3 +6,8 @@
  * 
  *
  */
+.consonant-OneHalfCard-title strong {
+  padding-left: 20px;
+  display: inline-block;
+}
+
