@@ -33,3 +33,9 @@
   padding-left: 20px;
   display: inline-block;
 }
+
+
+.cards .consonant-OneHalfCard .consonant-OneHalfCard-title strong {
+  display: inline-block;
+  padding-left: 20px;
+}
