@@ -1,4 +1,8 @@
 import { handleFocalpoint } from '../../utils/decorate.js';
+import {getLibs} from "../../scripts/scripts.js";
+
+const miloLibs = getLibs();
+const {createTag} = await import(`${miloLibs}/utils/utils.js`)
 
 export function handleBackground(div, section) {
   const pic = div.background.content?.querySelector('picture');
