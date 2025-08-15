@@ -30,7 +30,6 @@ const getCardType = (styles) => {
 
 const addInner = (el, cardType, card) => {
   const title = el.querySelector('h1, h2, h3, h4, h5, h6');
-
   title?.classList.add(`card-title`);
   const text = Array.from(el.querySelectorAll('p'))?.find((p) => !p.querySelector('picture, a'));
   let inner = el.querySelector(':scope > div:not([class])');
