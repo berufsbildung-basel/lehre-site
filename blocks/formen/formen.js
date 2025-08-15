@@ -28,7 +28,8 @@ loadTurnstile();
 
 function createSelect({ field, placeholder, options, defval, required }) {
   const select = createTag('select', { id: field });
-  if (placeholder) select.append(createTag('option', { selected: '', disabled: '' }, placeholder));
+  const placeholderText = placeholder || 'Bitte wählen';
+  select.append(createTag('option', { selected: '', disabled: '', value: '' }, placeholderText));
   options.split(',').forEach((o) => {
     const text = o.trim();
     const option = createTag('option', { value: text }, text);
@@ -229,6 +230,12 @@ function createButton({ type, label }, thankYou) {
         if (!submission) return;
         clearForm(form);
         
+        // Hide/remove the Turnstile widget after successful submission
+        const turnstileWidget = form.querySelector('.cf-turnstile');
+        if (turnstileWidget) {
+          turnstileWidget.remove();
+        }
+        
         // clears session storage after successful submission
         sessionStorage.removeItem(`formData_${form.dataset.action}`);
         
@@ -254,7 +261,7 @@ function createHeading({ label }, el) {
 }
 
 function createInput({ type, field, placeholder, required, defval }) {
-  const input = createTag('input', { type, id: field, placeholder, value: defval });
+  const input = createTag('input', { type, id: field, placeholder, value: defval && defval !== 'undefined' ? defval : '' });
   if (required === 'x') input.setAttribute('required', 'required');
   return input;
 }
@@ -396,20 +403,20 @@ function navigateStep(form, targetStep) {
     progressFill.style.width = `${progressPercent}%`;
   }
   
-  // Update navigation
+  // updates the navigation buttons
   const navigation = form.querySelector('.step-navigation');
   if (navigation) {
     navigation.replaceWith(createStepNavigation(targetStep, getTotalSteps(form), form));
   }
   
-  // Store current step
+  // stores current step
   form.dataset.currentStep = targetStep;
 }
 
 function validateCurrentStep(form, step) {
   const stepElement = form.querySelector(`[data-step="${step}"]`);
   const requiredFields = stepElement.querySelectorAll('[required]');
-  
+
   let valid = true;
   requiredFields.forEach(field => {
     if (!field.checkValidity()) {
@@ -547,7 +554,14 @@ function applyRules(form, rules) {
 
 function lowercaseKeys(obj) {
   return Object.keys(obj).reduce((acc, key) => {
-    acc[key.toLowerCase() === 'default' ? 'defval' : key.toLowerCase()] = obj[key];
+    const lowerKey = key.toLowerCase();
+    if (lowerKey === 'default') {
+      acc['defval'] = obj[key];
+    } else if (lowerKey === 'mandatory') {
+      acc['required'] = obj[key];
+    } else {
+      acc[lowerKey] = obj[key];
+    }
     return acc;
   }, {});
 }
