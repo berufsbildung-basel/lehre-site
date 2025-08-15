@@ -69,6 +69,8 @@ const init = (el) => {
   const base = miloLibs || codeRoot;
   loadStyle(`${base}/deps/caas.css`);
 
+  el.classList.add(`border`);
+
   const section = el.closest('.section');
   section.classList.add('milo-card-section');
   const row = el.querySelector(':scope > div');

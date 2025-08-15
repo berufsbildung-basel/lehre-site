@@ -6,7 +6,6 @@
 .card.consonant-OneHalfCard {
   min-height: 448px;
   height: unset;
-  border: 1px;
 }
 
 .card [class^="consonant-"]:is([class$="-title"], [class$="-text"]),
