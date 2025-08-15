@@ -28,3 +28,8 @@
   width: 100%;
   margin-bottom: var(--spacing-xs);
 }
+
+.cards .consonant-OneHalfCard .consonant-OneHalfCard-title strong {
+  display: inline-block;
+  padding-left: 20px;
+}
