@@ -1,10 +1,10 @@
 /* eslint-disable import/prefer-default-export */
-import {getLibs} from "../../scripts/scripts.js";
+import { getLibs } from '../../scripts/scripts.js';
 
-const miloLibs = getLibs()
+const miloLibs = getLibs();
 
-const {getMetadata} = await import(`${miloLibs}/blocks/section-metadata/section-metadata.js`);
-const {createTag} = await import(`${miloLibs}/utils/utils.js`);
+const { getMetadata } = await import(`${miloLibs}/blocks/section-metadata/section-metadata.js`);
+const { createTag } = await import(`${miloLibs}/utils/utils.js`);
 
 const DOUBLE_WIDE = 'DoubleWideCard';
 const HALF_HEIGHT = 'HalfHeightCard';

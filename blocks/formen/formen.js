@@ -12,17 +12,17 @@ const RULE_OPERATORS = {
 };
 
 const miloLibs = getLibs();
-const {createTag} = await import(`${miloLibs}/utils/utils.js`);
+const { createTag } = await import(`${miloLibs}/utils/utils.js`);
 
 function loadTurnstile() {
-    if (!document.getElementById('cf-turnstile-script')) {
-        const script = document.createElement('script');
-        script.id = 'cf-turnstile-script';
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-    }
+  if (!document.getElementById('cf-turnstile-script')) {
+    const script = document.createElement('script');
+    script.id = 'cf-turnstile-script';
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }
 }
 loadTurnstile();
 
@@ -65,9 +65,7 @@ async function submitForm(formOrPayload) {
   try {
     const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json', },
       body: JSON.stringify(payload),
     });
 
@@ -157,7 +155,6 @@ function createButton({ type, label }, thankYou) {
   }
   return button;
 }
-
 
 function createHeading({ label }, el) {
   return createTag(el, {}, label);

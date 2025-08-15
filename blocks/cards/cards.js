@@ -1,10 +1,10 @@
 import { addBackgroundImg, addWrapper, addFooter, addVideoBtn } from './cardsUtils.js';
-import {getLibs} from "../../scripts/scripts.js";
+import { getLibs } from '../../scripts/scripts.js';
 
-const miloLibs = getLibs()
+const miloLibs = getLibs();
 
-const {loadStyle, getConfig} = await import(`${miloLibs}/utils/utils.js`);
-const {decorateButtons} = await import(`${miloLibs}/utils/decorate.js`);
+const { loadStyle, getConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { decorateButtons } = await import(`${miloLibs}/utils/decorate.js`);
 
 const HALF = 'OneHalfCard';
 const HALF_HEIGHT = 'HalfHeightCard';
@@ -30,7 +30,7 @@ const getCardType = (styles) => {
 
 const addInner = (el, cardType, card) => {
   const title = el.querySelector('h1, h2, h3, h4, h5, h6');
-  title?.classList.add(`card-title`);
+  title?.classList.add('card-title');
   const text = Array.from(el.querySelectorAll('p'))?.find((p) => !p.querySelector('picture, a'));
   let inner = el.querySelector(':scope > div:not([class])');
 
@@ -65,11 +65,11 @@ const addInner = (el, cardType, card) => {
 };
 
 const init = (el) => {
-  const { miloLibs, codeRoot } = getConfig();
+  const { codeRoot } = getConfig();
   const base = miloLibs || codeRoot;
   loadStyle(`${base}/deps/caas.css`);
 
-  el.classList.add(`border`);
+  el.classList.add('border');
 
   const section = el.closest('.section');
   section.classList.add('milo-card-section');
@@ -116,4 +116,3 @@ const init = (el) => {
 };
 
 export default init;
-
