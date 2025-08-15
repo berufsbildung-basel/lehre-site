@@ -262,6 +262,13 @@ function createHeading({ label }, el) {
 
 function createInput({ type, field, placeholder, required, defval }) {
   const input = createTag('input', { type, id: field, placeholder, value: defval && defval !== 'undefined' ? defval : '' });
+
+  // this takes care of the max limit of the date so you cant set a birth date in the future
+  if (type === 'date') {
+    const today = new Date().toISOString().split('T')[0];
+    input.setAttribute('max', today);
+  }
+
   if (required === 'x') input.setAttribute('required', 'required');
   return input;
 }

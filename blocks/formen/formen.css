@@ -536,7 +536,7 @@
 
 .formen .step-back {
   border-color: var(--gray-400);
-  color: var(--gray-600);
+  color: white;
 }
 
 .formen .step-back:hover {
