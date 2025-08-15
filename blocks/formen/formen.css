@@ -792,3 +792,8 @@
     min-width: 140px;
   }
 }
+
+.formen div.field-wrapper.form-submit-wrapper.form-step-3.field-button-wrapper {
+  display: flex;
+  justify-self: center;
+}

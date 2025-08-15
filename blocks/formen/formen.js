@@ -229,6 +229,12 @@ function createButton({ type, label }, thankYou) {
         if (!submission) return;
         clearForm(form);
         
+        // Hide/remove the Turnstile widget after successful submission
+        const turnstileWidget = form.querySelector('.cf-turnstile');
+        if (turnstileWidget) {
+          turnstileWidget.remove();
+        }
+        
         // clears session storage after successful submission
         sessionStorage.removeItem(`formData_${form.dataset.action}`);
         
