@@ -409,7 +409,7 @@ function navigateStep(form, targetStep) {
     navigation.replaceWith(createStepNavigation(targetStep, getTotalSteps(form), form));
   }
   
-  // Store current step
+  // stores current step
   form.dataset.currentStep = targetStep;
 }
 
@@ -417,10 +417,6 @@ function validateCurrentStep(form, step) {
   const stepElement = form.querySelector(`[data-step="${step}"]`);
   const requiredFields = stepElement.querySelectorAll('[required]');
 
-  console.log('Validating step:', step);
-  console.log('Step element:', stepElement);
-  console.log('Required fields found:', requiredFields.length);
-  
   let valid = true;
   requiredFields.forEach(field => {
     if (!field.checkValidity()) {
