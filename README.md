@@ -1,7 +1,7 @@
 # Lehre-Site 
 Adobes Apprenticeship Information and Application Platform
 
-# Description
+## Description
 
 This is a website designed to provide potential apprentices in Switzerland with an authentic insight to our apprenticeship program. Visitors can read about the apprenticeship program and submit applications direclty through our website.
 
