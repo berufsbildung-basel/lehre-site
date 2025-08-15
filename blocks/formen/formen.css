@@ -22,6 +22,8 @@
   box-sizing: border-box;
   max-width: 900px;
   margin: 0 auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
   color: var(--gray-800);
   position: relative;
   overflow: hidden;
@@ -372,8 +374,7 @@
 @media screen and (min-width: 600px) {
   .formen form {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 var(--spacing-l);
+    grid-template-columns: 1fr;
     align-items: start;
   }
 
@@ -402,6 +403,7 @@
 /* Multi-step form styles */
 .formen .step-indicator {
   position: relative;
+  width: 80%;
   margin-bottom: 48px;
   padding: 0 24px;
 }
@@ -605,8 +607,9 @@
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 12px;
-  display: inline-flex;
+  display: grid;
   align-items: center;
+  align-content: center;
   gap: 8px;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
   transition: all 0.2s ease;
@@ -694,7 +697,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 10px;
   transition: all 0.2s ease;
   font-weight: bold;
 }
@@ -719,11 +722,16 @@
 /* Mobile optimizations */
 @media screen and (max-width: 600px) {
   .formen {
-    padding: 24px 16px;
+    padding: 24px 24px;
+    padding: 5%;
     margin: 16px;
     border-radius: 12px;
   }
   
+  .formen form {
+    display: block;
+  }
+
   .formen h2 {
     font-size: 24px;
   }
@@ -731,6 +739,7 @@
   .formen .step-indicator {
     padding: 0 16px;
     margin-bottom: 32px;
+    justify-self: center;
   }
   
   .formen .step {
