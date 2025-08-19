@@ -32,4 +32,9 @@ This is a small instruction of what hs to be done when you add blocks to the blo
    ```
    The `const { loadStyle, getConfig }` is created to substitute one of the two old imports and gets dynamically imported into the code, the same goes for `import { decorateButtons } from '../../utils/decorate.js';`
 
-Editors note: Ill continue later with this, not finished yet
+   Also pay good attention to the paths in the imports of the original file so you write it down correctly when you have the new imports like `const { decorateButtons } = await import(`${miloLibs}/utils/decorate.js`);`, utils/decorate.js is where it gets the function from which needs to be imported.
+
+### Pull requests
+
+Make sure that you provide the correct URL for testing when you run PSI checks.
+When aem-psi-checks provides you with example: `https://fix-cards--lehre-site--berufsbildung-basel.hlx.page/` make sure to change `.hlx`to `.aem`.
