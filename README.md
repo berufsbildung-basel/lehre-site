@@ -34,7 +34,7 @@ This is a small instruction of what hs to be done when you add blocks to the blo
 
    Also pay good attention to the paths in the imports of the original file so you write it down correctly when you have the new imports like `const { decorateButtons } = await import(`${miloLibs}/utils/decorate.js`);`, utils/decorate.js is where it gets the function from which needs to be imported.
 
-### Pull requests
+## Pull requests
 
 Make sure that you provide the correct URL for testing when you run PSI checks.
 When aem-psi-checks provides you with example: `https://fix-cards--lehre-site--berufsbildung-basel.hlx.page/` make sure to change `.hlx`to `.aem`.
