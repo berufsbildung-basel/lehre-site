@@ -37,5 +37,6 @@ This is a small instruction of what has to be done when you add blocks to the bl
 ## Pull Requests
 
 Make sure that you provide the correct URL for testing when you run PSI checks.
+
 When aem-psi-checks provides you with example: `https://fix-cards--lehre-site--berufsbildung-basel.hlx.page/` make sure to change `.hlx`to `.aem`.
 
