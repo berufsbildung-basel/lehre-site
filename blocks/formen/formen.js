@@ -18,7 +18,7 @@ function loadTurnstile() {
   if (!document.getElementById('cf-turnstile-script')) {
     const script = document.createElement('script');
     script.id = 'cf-turnstile-script';
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
@@ -65,7 +65,7 @@ async function submitForm(formOrPayload) {
   try {
     const response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
@@ -111,7 +111,6 @@ function createButton({ type, label }, thankYou) {
         if (!form.querySelector('.cf-turnstile')) {
           const captchaDiv = createTag('div', { class: 'cf-turnstile' });
           form.appendChild(captchaDiv);
-        
           turnstile.render(captchaDiv, {
             sitekey: '0x4AAAAAAA6uqp_nGspHkBq3',
             theme: 'light',
@@ -119,12 +118,11 @@ function createButton({ type, label }, thankYou) {
               console.log('Turnstile token:', token);
               form.dataset.turnstileToken = token;
               button.removeAttribute('disabled');
-            }
+            },
           });
-        
           button.setAttribute('disabled', 'true');
           return;
-        }        
+        }
 
         const token = form.dataset.turnstileToken;
         if (!token) {
@@ -138,10 +136,8 @@ function createButton({ type, label }, thankYou) {
 
         const submission = await submitForm(payload);
         button.removeAttribute('disabled');
-        
         if (!submission) return;
         clearForm(form);
-        
         const handleThankYou = thankYou.querySelector('a') ? thankYou.querySelector('a').href : thankYou.innerHTML;
         if (!thankYou.innerHTML.includes('href')) {
           const thanksText = createTag('h4', { class: 'thank-you' }, handleThankYou);
