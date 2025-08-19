@@ -1,5 +1,7 @@
 import { getLibs } from '../../scripts/scripts.js';
 
+/* global turnstile */
+
 const RULE_OPERATORS = {
   equal: '=',
   notEqual: '!=',
@@ -12,17 +14,17 @@ const RULE_OPERATORS = {
 };
 
 const miloLibs = getLibs();
-const {createTag} = await import(`${miloLibs}/utils/utils.js`);
+const { createTag } = await import(`${miloLibs}/utils/utils.js`);
 
 function loadTurnstile() {
-    if (!document.getElementById('cf-turnstile-script')) {
-        const script = document.createElement('script');
-        script.id = 'cf-turnstile-script';
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-    }
+  if (!document.getElementById('cf-turnstile-script')) {
+    const script = document.createElement('script');
+    script.id = 'cf-turnstile-script';
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }
 }
 loadTurnstile();
 
@@ -43,7 +45,7 @@ function createSelect({ field, placeholder, options, defval, required }) {
 function constructPayload(form) {
   const payload = {};
   const files = {};
-  
+
   // checks all the form elements so it can add them to the payload after
   [...form.elements].filter((el) => el.tagName !== 'BUTTON').forEach((fe) => {
     if (fe.type === 'file') {
@@ -52,7 +54,7 @@ function constructPayload(form) {
       }
       return; // file inputs dont get added to the regular payload
     }
-    
+
     if (fe.type.match(/(?:checkbox|radio)/)) {
       if (fe.checked) {
         payload[fe.name] = payload[fe.name] ? `${fe.value}, ${payload[fe.name]}` : fe.value;
@@ -61,30 +63,31 @@ function constructPayload(form) {
       }
       return;
     }
-    
+
     // makes sure that only non-file inputs get added to the payload
     if (fe.id && fe.type !== 'file') {
       payload[fe.id] = fe.value;
     }
   });
-  
+
   // checks for file inputs that might not be in form.elements
   const fileInputs = form.querySelectorAll('input[type="file"]');
-  
-  fileInputs.forEach(input => {
+
+  fileInputs.forEach((input) => {
     if (input.files && input.files.length > 0 && input.id) {
       files[input.id] = Array.from(input.files);
       // remove files from the payload if it was added there
       delete payload[input.id];
     }
   });
-  
+
   return { payload, files };
 }
 
 async function submitForm(formOrPayload) {
-  let payload, files;
-  
+  let payload; let
+    files;
+
   if (formOrPayload instanceof HTMLFormElement) {
     const formData = constructPayload(formOrPayload);
     payload = formData.payload;
@@ -95,30 +98,29 @@ async function submitForm(formOrPayload) {
   }
 
   payload.timestamp = new Date().toISOString();
-  
+
   const hasFiles = Object.keys(files).length > 0;
 
   try {
     let response;
-    
+
     if (hasFiles) {
       // creates FormData for multipart form submission, this is needed because the form data gets sent in json and the files need to be sent in an other format
       const formData = new FormData();
-      
+
       // adds form fields
-      Object.keys(payload).forEach(key => {
+      Object.keys(payload).forEach((key) => {
         formData.append(key, payload[key]);
       });
-      
-     files
-      Object.keys(files).forEach(fieldName => {
+
+      Object.keys(files).forEach((fieldName) => {
         files[fieldName].forEach((file, index) => {
           formData.append(`${fieldName}_${index}`, file, file.name);
         });
       });
-      
+
       // adds the file count in the payload of the form
-      Object.keys(files).forEach(fieldName => {
+      Object.keys(files).forEach((fieldName) => {
         formData.append(`${fieldName}_count`, files[fieldName].length.toString());
       });
 
@@ -129,9 +131,7 @@ async function submitForm(formOrPayload) {
     } else {
       response = await fetch('https://submission-worker.main--lehre-site--berufsbildung-basel.workers.dev', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
     }
@@ -144,7 +144,7 @@ async function submitForm(formOrPayload) {
       status: response.status,
       statusText: response.statusText,
       payload,
-      fileCount: Object.keys(files).reduce((count, key) => count + files[key].length, 0)
+      fileCount: Object.keys(files).reduce((count, key) => count + files[key].length, 0),
     });
 
     const result = await response.json();
@@ -175,7 +175,7 @@ function createButton({ type, label }, thankYou) {
   if (type === 'submit') {
     button.addEventListener('click', async (event) => {
       const form = button.closest('form');
-      const currentStep = parseInt(form.dataset.currentStep || '1');
+      const currentStep = parseInt(form.dataset.currentStep || '1', 10);
       const totalSteps = getTotalSteps(form);
 
       // Validate current step before proceeding
@@ -199,7 +199,7 @@ function createButton({ type, label }, thankYou) {
         if (!form.querySelector('.cf-turnstile')) {
           const captchaDiv = createTag('div', { class: 'cf-turnstile' });
           form.appendChild(captchaDiv);
-        
+
           turnstile.render(captchaDiv, {
             sitekey: '0x4AAAAAAA6uqp_nGspHkBq3',
             theme: 'light',
@@ -207,12 +207,12 @@ function createButton({ type, label }, thankYou) {
               console.log('Turnstile token:', token);
               form.dataset.turnstileToken = token;
               button.removeAttribute('disabled');
-            }
+            },
           });
-        
+
           button.setAttribute('disabled', 'true');
           return;
-        }        
+        }
 
         const token = form.dataset.turnstileToken;
         if (!token) {
@@ -226,19 +226,19 @@ function createButton({ type, label }, thankYou) {
 
         const submission = await submitForm(form);
         button.removeAttribute('disabled');
-        
+
         if (!submission) return;
         clearForm(form);
-        
+
         // Hide/remove the Turnstile widget after successful submission
         const turnstileWidget = form.querySelector('.cf-turnstile');
         if (turnstileWidget) {
           turnstileWidget.remove();
         }
-        
+
         // clears session storage after successful submission
         sessionStorage.removeItem(`formData_${form.dataset.action}`);
-        
+
         // might replace this with something else later on, but will leave it for now
 
         const handleThankYou = thankYou.querySelector('a') ? thankYou.querySelector('a').href : thankYou.innerHTML;
@@ -254,7 +254,6 @@ function createButton({ type, label }, thankYou) {
   }
   return button;
 }
-
 
 function createHeading({ label }, el) {
   return createTag(el, {}, label);
@@ -273,38 +272,38 @@ function createInput({ type, field, placeholder, required, defval }) {
   return input;
 }
 
-function createFileInput({ field, required, placeholder }) {
+function createFileInput({ field, required }) {
   const wrapper = createTag('div', { class: 'file-upload-wrapper' });
   const input = createTag('input', { type: 'file', id: field, multiple: true, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif' });
   if (required === 'x') input.setAttribute('required', 'required');
-  
+
   const dropZone = createTag('div', { class: 'file-drop-zone' });
   const attachButton = createTag('button', { type: 'button', class: 'attach-file-btn' }, 'Attach file');
   const dropText = createTag('span', { class: 'drop-text' }, 'Drop files here');
-  
+
   dropZone.append(attachButton, dropText);
-  
+
   // displays the files which are attached to the form
   const fileList = createTag('div', { class: 'file-list' });
-  
+
   attachButton.addEventListener('click', () => input.click());
-  
+
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     dropZone.classList.add('drag-over');
   });
-  
+
   dropZone.addEventListener('dragleave', () => {
     dropZone.classList.remove('drag-over');
   });
-  
+
   dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
     input.files = e.dataTransfer.files;
     updateFileList();
   });
-  
+
   function updateFileList() {
     fileList.innerHTML = '';
     Array.from(input.files).forEach((file, index) => {
@@ -312,7 +311,7 @@ function createFileInput({ field, required, placeholder }) {
       const fileName = createTag('span', { class: 'file-name' }, file.name);
       const fileSize = createTag('span', { class: 'file-size' }, formatFileSize(file.size));
       const removeBtn = createTag('button', { type: 'button', class: 'remove-file' }, '×');
-      
+
       removeBtn.addEventListener('click', () => {
         const dt = new DataTransfer();
         Array.from(input.files).forEach((f, i) => {
@@ -321,14 +320,14 @@ function createFileInput({ field, required, placeholder }) {
         input.files = dt.files;
         updateFileList();
       });
-      
+
       fileItem.append(fileName, fileSize, removeBtn);
       fileList.append(fileItem);
     });
   }
-  
+
   input.addEventListener('change', updateFileList);
-  
+
   wrapper.append(input, dropZone, fileList);
   return wrapper;
 }
@@ -338,7 +337,7 @@ function formatFileSize(bytes) {
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
 }
 
 // the steps arent properly implemented yet, due to there only being the one single page on the form page
@@ -348,29 +347,29 @@ function createStepIndicator(totalSteps, currentStep) {
   const progressLine = createTag('div', { class: 'progress-line' });
   const progressFill = createTag('div', { class: 'progress-fill' });
   progressLine.append(progressFill);
-  
+
   const stepsWrapper = createTag('div', { class: 'steps-wrapper' });
-  
+
   for (let i = 1; i <= totalSteps; i++) {
     const step = createTag('div', { class: `step ${i <= currentStep ? 'active' : ''}` });
     const stepNumber = createTag('span', { class: 'step-number' }, i.toString());
     step.append(stepNumber);
     stepsWrapper.append(step);
   }
-  
+
   wrapper.append(progressLine, stepsWrapper);
   return wrapper;
 }
 
 function createStepNavigation(currentStep, totalSteps, formElement) {
   const wrapper = createTag('div', { class: 'step-navigation' });
-  
+
   if (currentStep > 1) {
     const backBtn = createTag('button', { type: 'button', class: 'step-btn step-back' }, 'Zurück');
     backBtn.addEventListener('click', () => navigateStep(formElement, currentStep - 1));
     wrapper.append(backBtn);
   }
-  
+
   if (currentStep < totalSteps) {
     const nextBtn = createTag('button', { type: 'button', class: 'step-btn step-next' }, 'Weiter');
     nextBtn.addEventListener('click', () => {
@@ -381,22 +380,22 @@ function createStepNavigation(currentStep, totalSteps, formElement) {
     });
     wrapper.append(nextBtn);
   }
-  
+
   return wrapper;
 }
 
 function navigateStep(form, targetStep) {
   // hides the steps
-  form.querySelectorAll('.form-step').forEach(step => {
+  form.querySelectorAll('.form-step').forEach((step) => {
     step.style.display = 'none';
   });
-  
+
   // Show target step
   const targetStepElement = form.querySelector(`[data-step="${targetStep}"]`);
   if (targetStepElement) {
     targetStepElement.style.display = 'block';
   }
-  
+
   // updates the step indicator as in showing the current step you are currently on and the progress bar
   const indicator = form.querySelector('.step-indicator');
   if (indicator) {
@@ -404,18 +403,18 @@ function navigateStep(form, targetStep) {
     steps.forEach((step, index) => {
       step.classList.toggle('active', index < targetStep);
     });
-    
+
     const progressFill = indicator.querySelector('.progress-fill');
     const progressPercent = ((targetStep - 1) / (steps.length - 1)) * 100;
     progressFill.style.width = `${progressPercent}%`;
   }
-  
+
   // updates the navigation buttons
   const navigation = form.querySelector('.step-navigation');
   if (navigation) {
     navigation.replaceWith(createStepNavigation(targetStep, getTotalSteps(form), form));
   }
-  
+
   // stores current step
   form.dataset.currentStep = targetStep;
 }
@@ -425,13 +424,13 @@ function validateCurrentStep(form, step) {
   const requiredFields = stepElement.querySelectorAll('[required]');
 
   let valid = true;
-  requiredFields.forEach(field => {
+  requiredFields.forEach((field) => {
     if (!field.checkValidity()) {
       field.reportValidity();
       valid = false;
     }
   });
-  
+
   return valid;
 }
 
@@ -448,7 +447,7 @@ function loadFormDataFromSession(form) {
   const savedData = sessionStorage.getItem(`formData_${form.dataset.action}`);
   if (savedData) {
     const data = JSON.parse(savedData);
-    Object.keys(data).forEach(key => {
+    Object.keys(data).forEach((key) => {
       const field = form.querySelector(`#${key}`);
       if (field && field.type !== 'file') {
         if (field.type === 'checkbox' || field.type === 'radio') {
@@ -563,9 +562,9 @@ function lowercaseKeys(obj) {
   return Object.keys(obj).reduce((acc, key) => {
     const lowerKey = key.toLowerCase();
     if (lowerKey === 'default') {
-      acc['defval'] = obj[key];
+      acc.defval = obj[key];
     } else if (lowerKey === 'mandatory') {
-      acc['required'] = obj[key];
+      acc.required = obj[key];
     } else {
       acc[lowerKey] = obj[key];
     }
@@ -605,45 +604,45 @@ async function createForm(formURL, thankYou, formData) {
   const steps = {};
   let currentStepData = null;
   let stepCounter = 1;
-  
+
   json.data.forEach((fd) => {
     fd.type = fd.type || 'text';
-    
+
     // Determine step based on extra field or position
     let stepNumber = 1;
     if (fd.extra && fd.extra.includes('step-')) {
-      stepNumber = parseInt(fd.extra.match(/step-(\d+)/)[1]) || stepCounter;
+      stepNumber = parseInt(fd.extra.match(/step-(\d+)/)[1], 10) || stepCounter;
     } else if (currentStepData && currentStepData.stepNumber) {
       stepNumber = currentStepData.stepNumber;
     } else {
       stepNumber = stepCounter;
     }
-    
+
     if (!steps[stepNumber]) {
       steps[stepNumber] = [];
       stepCounter = stepNumber + 1;
     }
-    
+
     currentStepData = { stepNumber, field: fd };
     steps[stepNumber].push(fd);
   });
-  
+
   const totalSteps = Object.keys(steps).length;
-  
+
   // Create step indicator if more than one step
   if (totalSteps > 1) {
     form.append(createStepIndicator(totalSteps, 1));
   }
-  
+
   // Create steps
   Object.keys(steps).forEach((stepNum) => {
-    const stepNumber = parseInt(stepNum);
-    const stepWrapper = createTag('div', { 
-      class: 'form-step', 
+    const stepNumber = parseInt(stepNum, 10);
+    const stepWrapper = createTag('div', {
+      class: 'form-step',
       'data-step': stepNumber,
-      style: stepNumber === 1 ? 'block' : 'none'
+      style: stepNumber === 1 ? 'block' : 'none',
     });
-    
+
     steps[stepNum].forEach((fd) => {
       const style = fd.extra ? ` form-${fd.extra}` : '';
       const fieldWrapper = createTag(
@@ -667,24 +666,24 @@ async function createForm(formURL, thankYou, formData) {
       }
       stepWrapper.append(fieldWrapper);
     });
-    
+
     // Add step navigation if more than one step
     if (totalSteps > 1) {
       stepWrapper.append(createStepNavigation(stepNumber, totalSteps, form));
     }
-    
+
     form.append(stepWrapper);
   });
-  
+
   // Set initial step
   form.dataset.currentStep = '1';
 
   form.addEventListener('input', () => applyRules(form, rules));
   applyRules(form, rules);
-  
+
   // Load saved form data from session if available
   loadFormDataFromSession(form);
-  
+
   return form;
 }
 
