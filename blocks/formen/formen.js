@@ -426,8 +426,69 @@ function navigateStep(form, targetStep) {
     navigation.replaceWith(createStepNavigation(targetStep, getTotalSteps(form), form));
   }
 
+  // populates the summary if navigating to step 4
+  if (targetStep === 4) {
+    populateSummary(form);
+  }
+
   // stores current step
   form.dataset.currentStep = targetStep;
+}
+
+function populateSummary(form) {
+  // gets all the form data
+  const formData = constructPayload(form);
+  const { payload, files } = formData;
+  
+  // populates the text and select summary fields
+  const summaryMappings = {
+    'summaryGender': 'gender',
+    'summaryFirstName': 'firstName', 
+    'summaryLastName': 'lastName',
+    'summaryBirth': 'birth',
+    'summaryEmail': 'email',
+    'summaryNumber': 'number',
+    'summaryMotivationText': 'motivationText',
+    'summaryProjectUrls': 'projectUrls',
+    'summaryAdditionalMessage': 'additionalMessage'
+  };
+  
+  // populates the text fields
+  Object.keys(summaryMappings).forEach(summaryField => {
+    const originalField = summaryMappings[summaryField];
+    const summaryElement = form.querySelector(`#${summaryField}_display`);
+    if (summaryElement) {
+      const value = payload[originalField] || '—';
+      summaryElement.textContent = value;
+    }
+  });
+  
+  // populates the file summary fields
+  const fileSummaryMappings = {
+    'summaryCv': 'cv',
+    'summaryProfilePicture': 'profilePicture', 
+    'summaryMotivation': 'motivation',
+    'summaryCertificates': 'certificates',
+    'summaryMulticheck': 'multicheck',
+    'summaryAdditionalDocs': 'additionalDocs'
+  };
+  
+  Object.keys(fileSummaryMappings).forEach(summaryField => {
+    const originalField = fileSummaryMappings[summaryField];
+    const summaryElement = form.querySelector(`#${summaryField}_display`);
+    if (summaryElement) {
+      const fileIndicator = summaryElement.querySelector('.file-summary-indicator');
+      if (files[originalField] && files[originalField].length > 0) {
+        const fileCount = files[originalField].length;
+        const fileNames = files[originalField].map(f => f.name).join(', ');
+        fileIndicator.innerHTML = `${fileCount} file(s): ${fileNames}`;
+        fileIndicator.style.color = '#10b981'; 
+      } else {
+        fileIndicator.innerHTML = ' No files attached';
+        fileIndicator.style.color = '#6b7280'; 
+      }
+    }
+  });
 }
 
 function validateCurrentStep(form, step) {
@@ -475,6 +536,39 @@ function createTextArea({ field, placeholder, required, defval }) {
   const input = createTag('textarea', { id: field, placeholder, value: defval });
   if (required === 'x') input.setAttribute('required', 'required');
   return input;
+}
+
+function createSummaryField({ field, label, required }) {
+  const div = createTag('div', { 
+    class: 'summary-value', 
+    'data-summary-for': field.replace('summary', '').toLowerCase(),
+    id: `${field}_display`
+  });
+  div.textContent = '—'; // placeholder until populated
+  
+  if (required === 'x') {
+    div.classList.add('required-field');
+  }
+  
+  return div;
+}
+
+function createFileSummaryField({ field, label, required }) {
+  const div = createTag('div', { 
+    class: 'file-summary-value', 
+    'data-summary-for': field.replace('summary', '').toLowerCase(),
+    id: `${field}_display`
+  });
+  
+  const fileIndicator = createTag('div', { class: 'file-summary-indicator' });
+  fileIndicator.innerHTML = '📎 No files attached';
+  div.append(fileIndicator);
+  
+  if (required === 'x') {
+    div.classList.add('required-field');
+  }
+  
+  return div;
 }
 
 function createlabel({ field, label, required }) {
@@ -606,6 +700,8 @@ async function createForm(formURL, thankYou, formData) {
     'radio-group': { fn: createCheckGroup, params: ['radio'], label: true, classes: ['field-group-wrapper'] },
     'text-area': { fn: createTextArea, params: [], label: true, classes: [] },
     file: { fn: createFileInput, params: [], label: true, classes: ['field-file-wrapper'] },
+    summary: { fn: createSummaryField, params: [], label: true, classes: ['summary-field'] },
+    'file-summary': { fn: createFileSummaryField, params: [], label: true, classes: ['file-summary-field'] },
     submit: { fn: createButton, params: [thankYou], label: false, classes: ['field-button-wrapper'] },
     clear: { fn: createButton, params: [thankYou], label: false, classes: ['field-button-wrapper'] },
     default: { fn: createInput, params: [], label: true, classes: [] },
