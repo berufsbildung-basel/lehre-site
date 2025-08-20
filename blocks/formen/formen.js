@@ -259,9 +259,20 @@ function createHeading({ label }, el) {
   return createTag(el, {}, label);
 }
 
-function createInput({ type, field, placeholder, required, defval }) {
+function createInput({ type, field, placeholder, required, defval, format }) {
   const input = createTag('input', { type, id: field, placeholder, value: defval && defval !== 'undefined' ? defval : '' });
 
+  if (format && format.trim()) {
+    input.setAttribute('pattern', format);
+    // these are for the verification of the proper input formats
+    if (field === 'number') {
+      input.setAttribute('title', 'Please enter a valid phone number');
+    } else if (type === 'email') {
+      input.setAttribute('title', 'Please enter a valid email address');
+    } else {
+      input.setAttribute('title', 'Please match the required format');
+    }
+  }
   // this takes care of the max limit of the date so you cant set a birth date in the future
   if (type === 'date') {
     const today = new Date().toISOString().split('T')[0];
