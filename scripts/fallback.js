@@ -34,12 +34,12 @@ if (!locFallbackText) {
 }
 
 var span = document.createElement('span');
-span.textContent = locFallbackText
-span.lang = userLang
+span.textContent = locFallbackText;
+span.lang = userLang;
 div.appendChild(span);
 
 if(!document.body) {
-  document.body = document.createElement('body')
+  document.body = document.createElement('body');
 }
 document.body.insertBefore(div, document.body.firstChild);
 document.body.style.display = 'block';
