@@ -1,14 +1,13 @@
-// Finds "(map-iframe)" markers and replaces them with a real <iframe class="embed-map">.
-// ESLint-friendly: no globals, no console.
+// Replace "(map-iframe)" markers with a REAL <iframe class="embed-map">.
+// Pulls the Google Maps URL from the marker link itself, or from the first
+// google.com/maps link in the same table cell. Sizes width = 100% / colCount.
 
 function toEmbed(href) {
     try {
         const u = new URL(href, window.location.href);
-        // Already an embed URL?
         if (u.origin === 'https://www.google.com' && u.pathname.startsWith('/maps/embed')) {
             return u.toString();
         }
-        // Convert generic Maps URL to embed-ish (fallback)
         if (u.hostname.includes('google') && u.pathname.startsWith('/maps')) {
             const q = u.searchParams.get('q') || '';
             const out = new URL('https://www.google.com/maps');
@@ -21,24 +20,21 @@ function toEmbed(href) {
 }
 
 function computeWidthPct(node) {
-    let pct = '100%';
     const cell = node.closest('td') || node.parentElement;
     const row = cell && cell.closest('tr');
-    if (!row) return pct;
-    // Count the immediate cells in this row (th/td elements)
+    if (!row) return '100%';
     const cols = Array.prototype.filter.call(row.children, (c) => c.tagName === 'TD' || c.tagName === 'TH');
     const count = Math.max(1, cols.length);
-    pct = `${Math.round(100 / count)}%`;
-    return pct;
+    return `${Math.round(100 / count)}%`;
 }
 
 function findMarkerCandidates(root) {
     const list = [];
-    // (1) Anchors whose visible text is "(map-iframe)"
-    document.querySelectorAll('a').forEach((a) => {
+    // anchors whose text is "(map-iframe)"
+    root.querySelectorAll('a').forEach((a) => {
         if ((a.textContent || '').trim() === '(map-iframe)') list.push(a);
     });
-    // (2) Plain text nodes wrapped in p/div/span with exactly "(map-iframe)"
+    // plain text wrappers: p/div/span exactly "(map-iframe)"
     root.querySelectorAll('p,div,span').forEach((el) => {
         if (el.childElementCount === 0 && (el.textContent || '').trim() === '(map-iframe)') list.push(el);
     });
@@ -46,12 +42,10 @@ function findMarkerCandidates(root) {
 }
 
 function findMapsHrefNear(node) {
-    // If node itself is an <a>, use it.
     if (node.tagName === 'A') {
         const h = node.getAttribute('href') || '';
         if (h) return h;
     }
-    // Else, look for any Google Maps link in the same table cell
     const cell = node.closest('td') || node.parentElement;
     if (!cell) return '';
     const a = cell.querySelector('a[href*="google.com/maps"]');
@@ -72,19 +66,21 @@ function replaceMarkerWithIframe(marker) {
     iframe.referrerPolicy = 'no-referrer-when-downgrade';
     iframe.setAttribute('allowfullscreen', '');
 
-    // Title from aria-label/title on the nearest link or marker text
-    const a = marker.tagName === 'A' ? marker : (marker.closest('td') || marker.parentElement)?.querySelector('a[href*="google.com/maps"]');
-    const t = (a && (a.getAttribute('aria-label') || a.getAttribute('title'))) || 'Map';
-    iframe.title = t;
+    // Set defaults inline too, so no “Cannot resolve” warnings appear
+    iframe.style.setProperty('--mi-height', '420px'); // default; override below if you want
+    iframe.style.setProperty('--mi-aspect', '1/1');   // default square; delete this line for fixed height
 
     // Width based on table column count
     iframe.style.width = computeWidthPct(marker);
 
-    // Default to square via CSS var (can be overridden in CSS)
-    iframe.style.setProperty('--mi-aspect', '1/1');
+    // Accessible title
+    const cell = marker.closest('td') || marker.parentElement;
+    const linkForTitle = marker.tagName === 'A' ? marker : cell?.querySelector('a[href*="google.com/maps"]');
+    const title = (linkForTitle && (linkForTitle.getAttribute('aria-label') || linkForTitle.getAttribute('title'))) || 'Map';
+    iframe.title = title;
 
-    // Remove the nearby link if marker wasn’t the link itself (to avoid duplicate UI)
-    if (a && a !== marker) a.remove();
+    // Remove the nearby link if marker wasn’t the link itself (to avoid duplicates)
+    if (linkForTitle && linkForTitle !== marker) linkForTitle.remove();
 
     marker.replaceWith(iframe);
 }
