@@ -1,0 +1,22 @@
+/* Styles applied to the real <iframe> we inject */
+iframe.embed-map {
+  display: block;
+  /* Width is set inline by JS based on table columns (100% / colCount) */
+  /* Height strategy:
+     - If you keep the 'aspect' class, aspect-ratio controls height (responsive).
+     - Otherwise, it falls back to fixed height via --mi-height.
+  */
+  height: var(--mi-height, 420px);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+}
+
+/* Responsive aspect ratio (JS sets --mi-aspect = '1/1' by default) */
+iframe.embed-map {
+  aspect-ratio: var(--mi-aspect, auto);
+}
+/* When aspect-ratio is active, let the browser compute height */
+iframe.embed-map[style*="--mi-aspect"] {
+  height: auto;
+}
