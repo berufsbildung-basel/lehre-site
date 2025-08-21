@@ -285,17 +285,35 @@ function createInput({ type, field, placeholder, required, defval, format }) {
 
 function createFileInput({ field, required }) {
   const wrapper = createTag('div', { class: 'file-upload-wrapper' });
-  const input = createTag('input', { type: 'file', id: field, multiple: true, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif' });
+  
+  let acceptTypes = '.pdf';
+  if (field === 'profilePicture') {
+    acceptTypes = '.jpg,.jpeg,.png,.gif,.webp';
+  }
+  
+  const input = createTag('input', { type: 'file', id: field, multiple: true, accept: acceptTypes });
   if (required === 'x') input.setAttribute('required', 'required');
 
   const dropZone = createTag('div', { class: 'file-drop-zone' });
   const attachButton = createTag('button', { type: 'button', class: 'attach-file-btn' }, 'Attach file');
-  const dropText = createTag('span', { class: 'drop-text' }, 'Drop files here');
+  const dropTextContent = field === 'profilePicture' ? 'Drop images here (JPG, PNG, GIF)' : 'Drop PDF files here';
+  const dropText = createTag('span', { class: 'drop-text' }, dropTextContent);
 
   dropZone.append(attachButton, dropText);
 
+  // error message container for the CSS styling
+  const errorMessage = createTag('div', { class: 'file-error-message' });
+  
   // displays the files which are attached to the form
   const fileList = createTag('div', { class: 'file-list' });
+
+  function showErrorMessage(message) {
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+    setTimeout(() => {
+      errorMessage.style.display = 'none';
+    }, 4000); // set it to hide the error message after four seconds
+  }
 
   attachButton.addEventListener('click', () => input.click());
 
@@ -311,6 +329,22 @@ function createFileInput({ field, required }) {
   dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
+    
+    // added this for the drop zone to check if the files are the correct type
+    const files = Array.from(e.dataTransfer.files);
+    const invalidFiles = files.filter(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      return field === 'profilePicture' ? 
+        !['jpg','jpeg','png','gif','webp'].includes(ext) : 
+        ext !== 'pdf';
+    });
+    
+    // exception which triggers error message underneath the drop zone if the files are not the correct type
+    if (invalidFiles.length > 0) {
+      showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
+      return;
+    }
+    
     input.files = e.dataTransfer.files;
     updateFileList();
   });
@@ -337,9 +371,22 @@ function createFileInput({ field, required }) {
     });
   }
 
-  input.addEventListener('change', updateFileList);
+  input.addEventListener('change', (e) => {
+    const invalidFiles = Array.from(e.target.files).filter(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      return field === 'profilePicture' ? 
+        !['jpg','jpeg','png','gif','webp'].includes(ext) : 
+        ext !== 'pdf';
+    });
+    
+    if (invalidFiles.length > 0) {
+      showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
+      e.target.value = ''; // clears the files form the input field
+    }
+    updateFileList();
+  });
 
-  wrapper.append(input, dropZone, fileList);
+  wrapper.append(input, dropZone, errorMessage, fileList);
   return wrapper;
 }
 
@@ -484,7 +531,7 @@ function populateSummary(form) {
         fileIndicator.innerHTML = `${fileCount} file(s): ${fileNames}`;
         fileIndicator.style.color = '#10b981'; 
       } else {
-        fileIndicator.innerHTML = ' No files attached';
+        fileIndicator.innerHTML = 'No files attached';
         fileIndicator.style.color = '#6b7280'; 
       }
     }
@@ -561,7 +608,7 @@ function createFileSummaryField({ field, label, required }) {
   });
   
   const fileIndicator = createTag('div', { class: 'file-summary-indicator' });
-  fileIndicator.innerHTML = '📎 No files attached';
+  fileIndicator.innerHTML = 'No files attached';
   div.append(fileIndicator);
   
   if (required === 'x') {
