@@ -89,6 +89,7 @@ const miloLibs = setLibs(LIBS);
   });
 }());
 
+//checks if document uses map-iframe web-component
 function needsMapIframe(root = document) {
   if ([...root.querySelectorAll('a,p,span,div')].some(el => (el.textContent || '').trim() === '(map-iframe)')) return true;
   return !!root.querySelector('a[href*="google.com/maps"]');
@@ -100,7 +101,7 @@ function needsMapIframe(root = document) {
   setConfig({ ...CONFIG, miloLibs });
   await loadArea();
 
-
+//if map-iframe is used, it calls it
   if (needsMapIframe(document)) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';

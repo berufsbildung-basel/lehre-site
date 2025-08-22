@@ -1,4 +1,4 @@
-
+//helper function to normalise standard google maps links into embed links
 function toEmbed(href) {
     try {
         const u = new URL(href, window.location.href);
@@ -16,6 +16,7 @@ function toEmbed(href) {
     return href;
 }
 
+//find amount of columns and calculate iframe-map size (2 columns = 50%, 3 = 33% ect.)
 function computeWidthPct(node) {
     const cell = node.closest('td') || node.parentElement;
     const row = cell && cell.closest('tr');
@@ -25,6 +26,7 @@ function computeWidthPct(node) {
     return `${Math.round(100 / count)}%`;
 }
 
+//fixes issue where iframe element gets reverted to an "a" html element
 function findMarkers(root) {
     const out = [];
     root.querySelectorAll('a').forEach((a) => {
@@ -36,6 +38,7 @@ function findMarkers(root) {
     return out;
 }
 
+//finds the url to embed
 function findMapsHrefNear(node) {
     if (node.tagName === 'A') {
         const h = node.getAttribute('href') || '';
@@ -47,6 +50,7 @@ function findMapsHrefNear(node) {
     return a ? (a.getAttribute('href') || '') : '';
 }
 
+//lazy loader
 function lazySetSrc(iframe, src) {
     const assign = () => { if (!iframe.src) iframe.src = src; };
 
@@ -65,6 +69,7 @@ function lazySetSrc(iframe, src) {
     }
 }
 
+//replaces "a" elements with iframe
 function replaceMarkerWithIframe(marker) {
     const href = findMapsHrefNear(marker);
     if (!href) return;
