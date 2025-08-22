@@ -83,25 +83,25 @@ function replaceMarkerWithIframe(marker) {
     iframe.referrerPolicy = 'no-referrer-when-downgrade';
     iframe.loading = 'lazy'; // hint for native lazy loaders
 
-    // Defaults for custom props so CSS always resolves
+    // css
     iframe.style.setProperty('--mi-height', '420px'); // used if no aspect
     iframe.style.setProperty('--mi-aspect', '1/1');   // square by default
 
-    // Width based on table columns
+    // width based on table columns
     iframe.style.width = computeWidthPct(marker);
 
-    // Accessible title
+    // accessible title
     const cell = marker.closest('td') || marker.parentElement;
     const linkForTitle = marker.tagName === 'A' ? marker : cell?.querySelector('a[href*="google.com/maps"]');
     const title = (linkForTitle && (linkForTitle.getAttribute('aria-label') || linkForTitle.getAttribute('title'))) || 'Map';
     iframe.title = title;
 
-    // Remove nearby link to avoid duplicate UI (keep if you prefer)
+    // removes nearby link to avoid duplicate UI
     if (linkForTitle && linkForTitle !== marker) linkForTitle.remove();
 
     marker.replaceWith(iframe);
 
-    // Defer the network until near viewport
+    // defer the network until near viewport
     lazySetSrc(iframe, src);
 }
 
