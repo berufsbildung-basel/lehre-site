@@ -12,7 +12,7 @@ function toEmbed(href) {
             out.searchParams.set('output', 'embed');
             return out.toString();
         }
-    } catch (_) { /* ignore */ }
+    } catch (err) { console.error('map-iframe: toEmbed URL parse failed', err); }
     return href;
 }
 
