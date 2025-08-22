@@ -1,8 +1,3 @@
-// Turns "(map-iframe)" into a REAL <iframe class="embed-map"> and lazy-loads it.
-// - Finds the embed URL from the marker's own href (if it's an <a>)
-//   or from the first google.com/maps link in the same table cell.
-// - Width = 100% / (# columns in the current table row)
-// - Uses IntersectionObserver to set iframe.src only when near viewport.
 
 function toEmbed(href) {
     try {
