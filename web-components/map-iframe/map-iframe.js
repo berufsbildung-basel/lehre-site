@@ -1,6 +1,8 @@
-// Replace "(map-iframe)" markers with a REAL <iframe class="embed-map">.
-// Pulls the Google Maps URL from the marker link itself, or from the first
-// google.com/maps link in the same table cell. Sizes width = 100% / colCount.
+// Turns "(map-iframe)" into a REAL <iframe class="embed-map"> and lazy-loads it.
+// - Finds the embed URL from the marker's own href (if it's an <a>)
+//   or from the first google.com/maps link in the same table cell.
+// - Width = 100% / (# columns in the current table row)
+// - Uses IntersectionObserver to set iframe.src only when near viewport.
 
 function toEmbed(href) {
     try {
@@ -28,17 +30,15 @@ function computeWidthPct(node) {
     return `${Math.round(100 / count)}%`;
 }
 
-function findMarkerCandidates(root) {
-    const list = [];
-    // anchors whose text is "(map-iframe)"
+function findMarkers(root) {
+    const out = [];
     root.querySelectorAll('a').forEach((a) => {
-        if ((a.textContent || '').trim() === '(map-iframe)') list.push(a);
+        if ((a.textContent || '').trim() === '(map-iframe)') out.push(a);
     });
-    // plain text wrappers: p/div/span exactly "(map-iframe)"
     root.querySelectorAll('p,div,span').forEach((el) => {
-        if (el.childElementCount === 0 && (el.textContent || '').trim() === '(map-iframe)') list.push(el);
+        if (!el.childElementCount && (el.textContent || '').trim() === '(map-iframe)') out.push(el);
     });
-    return list;
+    return out;
 }
 
 function findMapsHrefNear(node) {
@@ -52,6 +52,24 @@ function findMapsHrefNear(node) {
     return a ? (a.getAttribute('href') || '') : '';
 }
 
+function lazySetSrc(iframe, src) {
+    const assign = () => { if (!iframe.src) iframe.src = src; };
+
+    if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+            if (entries.some((e) => e.isIntersecting)) {
+                assign();
+                io.disconnect();
+            }
+        }, { rootMargin: '400px' }); // start a bit before it enters view
+        io.observe(iframe);
+    } else {
+        // Fallback: rely on native lazy-loading where supported
+        iframe.loading = 'lazy';
+        assign();
+    }
+}
+
 function replaceMarkerWithIframe(marker) {
     const href = findMapsHrefNear(marker);
     if (!href) return;
@@ -61,16 +79,15 @@ function replaceMarkerWithIframe(marker) {
 
     const iframe = document.createElement('iframe');
     iframe.className = 'embed-map';
-    iframe.src = src;
-    iframe.loading = 'lazy';
-    iframe.referrerPolicy = 'no-referrer-when-downgrade';
     iframe.setAttribute('allowfullscreen', '');
+    iframe.referrerPolicy = 'no-referrer-when-downgrade';
+    iframe.loading = 'lazy'; // hint for native lazy loaders
 
-    // Set defaults inline too, so no “Cannot resolve” warnings appear
-    iframe.style.setProperty('--mi-height', '420px'); // default; override below if you want
-    iframe.style.setProperty('--mi-aspect', '1/1');   // default square; delete this line for fixed height
+    // Defaults for custom props so CSS always resolves
+    iframe.style.setProperty('--mi-height', '420px'); // used if no aspect
+    iframe.style.setProperty('--mi-aspect', '1/1');   // square by default
 
-    // Width based on table column count
+    // Width based on table columns
     iframe.style.width = computeWidthPct(marker);
 
     // Accessible title
@@ -79,14 +96,17 @@ function replaceMarkerWithIframe(marker) {
     const title = (linkForTitle && (linkForTitle.getAttribute('aria-label') || linkForTitle.getAttribute('title'))) || 'Map';
     iframe.title = title;
 
-    // Remove the nearby link if marker wasn’t the link itself (to avoid duplicates)
+    // Remove nearby link to avoid duplicate UI (keep if you prefer)
     if (linkForTitle && linkForTitle !== marker) linkForTitle.remove();
 
     marker.replaceWith(iframe);
+
+    // Defer the network until near viewport
+    lazySetSrc(iframe, src);
 }
 
 function run(root = document) {
-    const markers = findMarkerCandidates(root);
+    const markers = findMarkers(root);
     if (!markers.length) return;
     markers.forEach(replaceMarkerWithIframe);
 }

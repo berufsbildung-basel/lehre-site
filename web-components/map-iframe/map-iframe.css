@@ -1,10 +1,10 @@
 /* Defaults so custom properties always resolve */
 iframe.embed-map {
-  --mi-height: 420px;     /* default height if no aspect given */
-  --mi-aspect: 1/1;       /* default ratio; change in JS or override per page */
+  --mi-height: 420px;   /* used when no aspect ratio is applied */
+  --mi-aspect: 1/1;     /* default to square; override if needed */
 
   display: block;
-  width: 100%;            /* JS will set exact % based on table columns */
+  width: 100%;          /* exact % is set inline by JS based on table columns */
   height: var(--mi-height);
   border: 0;
   border-radius: 12px;
@@ -12,7 +12,7 @@ iframe.embed-map {
   aspect-ratio: var(--mi-aspect);
 }
 
-/* When an aspect ratio is set, let the browser compute height from it */
+/* When an aspect ratio is in effect, let the browser decide height */
 iframe.embed-map[style*="--mi-aspect"] {
   height: auto;
 }
