@@ -33,3 +33,20 @@
   display: inline-block;
   padding-left: 20px;
 }
+
+.card-icon {
+  display: inline-block;
+  margin-left: 80px;
+  width: 30px;
+  height: 30px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.card-icon.icon-school {
+  background-image: url('https://adobe.sharepoint.com/sites/HelixProjects/Shared%20Documents/sites/berufsbildung-basel/lehre-site/icons/school-svgrepo-com.svg');
+}
+
+.card-icon.icon-center {
+  background-image: url('https://adobe.sharepoint.com/sites/HelixProjects/Shared%20Documents/sites/berufsbildung-basel/lehre-site/icons/school-svgrepo-com.svg');
+}

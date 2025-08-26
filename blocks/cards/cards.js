@@ -30,7 +30,12 @@ const getCardType = (styles) => {
 
 const addInner = (el, cardType, card) => {
   const title = el.querySelector('h1, h2, h3, h4, h5, h6');
-  title?.classList.add('card-title');
+  if (!title) {
+    console.error('Title element not found.');
+    return;
+  }
+
+  title.classList.add('card-title');
   const text = Array.from(el.querySelectorAll('p'))?.find((p) => !p.querySelector('picture, a'));
   let inner = el.querySelector(':scope > div:not([class])');
 
@@ -47,20 +52,36 @@ const addInner = (el, cardType, card) => {
     el.querySelector(':scope > div:not([class])')?.remove();
   }
 
+  const iconMapping = {
+    school: "icon-school",
+    center: "icon-center",
+    "l-title": "icon-title",
+    "xxl-spacing": "icon-spacing",
+    "l-lockup": "icon-lockup",
+    "max-width-4-desktop": "icon-desktop",
+    "xl-button": "icon-button",
+  };
+
+  const keywords = Object.keys(iconMapping).filter((key) => el.classList.contains(key));
+
+  keywords.forEach((keyword) => {
+    const iconClass = iconMapping[keyword];
+    if (iconClass) {
+      const icon = document.createElement("span");
+      icon.classList.add("card-icon", iconClass);
+      title.append(icon);
+    }
+  });
+
   inner.classList.add(`consonant-${cardType}-inner`);
   card.append(inner);
 
   if (cardType === PRODUCT) {
-    inner.querySelector(':scope > div')?.classList.add('consonant-ProductCard-row');
+    inner.querySelector(":scope > div")?.classList.add("consonant-ProductCard-row");
     if (text) inner.append(text);
   }
 
-  if (cardType === HALF_HEIGHT) {
-    title?.setAttribute('role', 'presentation');
-    text?.remove();
-  }
-
-  title?.classList.add(`consonant-${cardType}-title`);
+  title.classList.add(`consonant-${cardType}-title`);
   text?.classList.add(`consonant-${cardType}-text`);
 };
 
