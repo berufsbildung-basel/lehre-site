@@ -13,6 +13,8 @@ const RULE_OPERATORS = {
   excludes: 'exc',
 };
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit
+
 const miloLibs = getLibs();
 const { createTag } = await import(`${miloLibs}/utils/utils.js`);
 
