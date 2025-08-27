@@ -386,13 +386,6 @@ function createFileInput({ field, required }) {
       e.target.value = ''; // clears the files form the input field
     }
 
-    // const maxFileSize = 10 * 1024 * 1024; // 10MB
-    // const fileSize = e.target.files[0].size;
-    // if (fileSize > maxFileSize) {
-    //   showErrorMessage(`File size exceeds the maximum limit of 10MB.`);
-    //   e.target.value = '';
-    // }
-    // updates the file list
     updateFileList();
   });
 
