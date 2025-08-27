@@ -488,7 +488,7 @@ function navigateStep(form, targetStep) {
     populateSummary(form);
   }
 
-  if (window.innerWidth < 600) {
+  if (window.innerWidth < 1200) {
     form.scrollIntoView({
       behavior: 'smooth',
       block: 'start'

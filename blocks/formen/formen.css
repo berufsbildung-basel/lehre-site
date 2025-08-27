@@ -766,6 +766,19 @@
     margin: 16px;
     border-radius: 12px;
   }
+
+  .formen .form-step[data-step="4"] .field-wrapper:not(.field-button-wrapper) {
+    display: grid;
+    gap: 16px;
+    align-items: start;
+  }
+  
+  .formen .form-step[data-step="4"] .field-wrapper label {
+    margin-bottom: 0;
+    padding-top: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+  }
   
   .formen form {
     display: block;
@@ -975,6 +988,12 @@
 .formen div.field-wrapper.form-submit-wrapper.form-step-3.field-button-wrapper {
   display: flex;
   justify-self: center;
+}
+
+.formen .cf-turnstile {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
 }
 
 /* .formen div.form-step[data-step="4"] {
