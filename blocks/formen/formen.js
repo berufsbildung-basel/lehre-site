@@ -385,6 +385,14 @@ function createFileInput({ field, required }) {
       showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
       e.target.value = ''; // clears the files form the input field
     }
+
+    // const maxFileSize = 10 * 1024 * 1024; // 10MB
+    // const fileSize = e.target.files[0].size;
+    // if (fileSize > maxFileSize) {
+    //   showErrorMessage(`File size exceeds the maximum limit of 10MB.`);
+    //   e.target.value = '';
+    // }
+    // updates the file list
     updateFileList();
   });
 
@@ -400,7 +408,7 @@ function formatFileSize(bytes) {
   return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
 }
 
-// the steps arent properly implemented yet, due to there only being the one single page on the form page
+// the steps arent properly implemented yet, due to there only being the one single page on the form page (the steps are implemented now)
 
 function createStepIndicator(totalSteps, currentStep) {
   const wrapper = createTag('div', { class: 'step-indicator' });
@@ -478,6 +486,13 @@ function navigateStep(form, targetStep) {
   // populates the summary if navigating to step 4
   if (targetStep === 4) {
     populateSummary(form);
+  }
+
+  if (window.innerWidth < 600) {
+    form.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   }
 
   // stores current step
