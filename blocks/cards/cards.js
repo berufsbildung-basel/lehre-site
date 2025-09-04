@@ -64,25 +64,53 @@ const addInner = (el, cardType, card) => {
 
   const keywords = Object.keys(iconMapping).filter((key) => el.classList.contains(key));
 
-  keywords.forEach((keyword) => {
-    const iconClass = iconMapping[keyword];
-    if (iconClass) {
-      const icon = document.createElement("span");
-      icon.classList.add("card-icon", iconClass);
-      title.append(icon);
-    }
-  });
+  // Create and add icon before title
+  if (keywords.length > 0) {
+    keywords.forEach((keyword) => {
+      const iconClass = iconMapping[keyword];
+      if (iconClass) {
+        const icon = document.createElement("div");
+        icon.classList.add("card-icon", iconClass);
+        inner.prepend(icon);
+      }
+    });
+  } else {
+    // Add default empty icon circle
+    const defaultIcon = document.createElement("div");
+    defaultIcon.classList.add("card-icon");
+    inner.prepend(defaultIcon);
+  }
+
+  // Always create description text
+  const description = document.createElement("p");
+  description.classList.add(`consonant-${cardType}-text`);
+  description.textContent = "Something short and simple here maybe I don't know";
+
+  // Insert description after title
+  if (title.parentNode) {
+    title.parentNode.insertBefore(description, title.nextSibling);
+  }
 
   inner.classList.add(`consonant-${cardType}-inner`);
   card.append(inner);
 
   if (cardType === PRODUCT) {
     inner.querySelector(":scope > div")?.classList.add("consonant-ProductCard-row");
-    if (text) inner.append(text);
   }
 
   title.classList.add(`consonant-${cardType}-title`);
-  text?.classList.add(`consonant-${cardType}-text`);
+
+  // Remove any existing bullet lists from the main content
+  const existingLists = inner.querySelectorAll('ul');
+  existingLists.forEach(list => list.remove());
+
+  // Also remove any paragraphs with links to clean up the main content
+  const paragraphsWithLinks = inner.querySelectorAll('p');
+  paragraphsWithLinks.forEach(p => {
+    if (p.querySelector('a')) {
+      p.remove();
+    }
+  });
 };
 
 const init = (el) => {

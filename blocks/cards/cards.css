@@ -26,27 +26,176 @@
   border: none;
   height: 1px;
   width: 100%;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 2rem;
 }
 
-.card-title {
-  display: inline-block;
-  padding-left: 20px;
+/* =========================
+   CARD DESIGN REBUILD
+   ========================= */
+
+.consonant-Card {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 2rem 1em 1em;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+  border: 1px solid #e0e0e0;
 }
 
-.card-icon {
-  display: inline-block;
-  margin-left: 80px;
-  width: 30px;
-  height: 30px;
-  background-size: contain;
+.consonant-Card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* Circle container for icon - smaller and higher */
+.consonant-Card .card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem auto;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  background-size: 30px 30px;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
-.card-icon.icon-school {
+/* Hide bullet points in main content */
+.consonant-Card ul,
+.consonant-Card li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.consonant-Card p {
+  margin: 0 0 1rem 0;
+}
+
+/* Hide bullets from main content paragraphs */
+.consonant-OneHalfCard .consonant-OneHalfCard-inner ul,
+.consonant-ProductCard .consonant-ProductCard-inner ul {
+  display: none;
+}
+
+/* Title styling - fixed for multiline text */
+.consonant-Card .consonant-OneHalfCard-title,
+.consonant-Card .consonant-ProductCard-title,
+.consonant-Card .consonant-DoubleWideCard-title,
+.consonant-Card .consonant-HalfHeightCard-title {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: #1a1a1a;
+  line-height: 1.4;
+  text-align: center;
+  min-height: 2.8rem;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Description text styling */
+.consonant-Card .consonant-OneHalfCard-text,
+.consonant-Card .consonant-ProductCard-text,
+.consonant-Card .consonant-DoubleWideCard-text,
+.consonant-Card .consonant-HalfHeightCard-text {
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #666;
+  margin: 0 auto 2rem auto;
+  max-width: 100%;
+  text-align: center;
+  padding: 0;
+}
+
+/* Footer section with bullet points - removed border line */
+.consonant-Card .consonant-CardFooter {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  display: block;
+  visibility: visible;
+}
+
+.consonant-Card .consonant-CardFooter .consonant-CardFooter-row {
+  display: block;
+  text-align: left;
+}
+
+.consonant-Card .consonant-CardFooter .consonant-CardFooter-cell {
+  display: block;
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 18px;
+  visibility: visible;
+}
+
+.consonant-Card .consonant-CardFooter .consonant-CardFooter-cell:last-child {
+  margin-bottom: 0;
+}
+
+.consonant-Card .consonant-CardFooter .consonant-CardFooter-cell::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #333;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.consonant-Card .consonant-CardFooter .consonant-CardFooter-cell a {
+  color: #333;
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: block;
+  visibility: visible;
+}
+
+.consonant-Card .consonant-CardFooter .consonant-CardFooter-cell a:hover {
+  color: #000;
+}
+
+/* Ensure footer shows even if empty - for debugging */
+.consonant-Card .consonant-CardFooter:empty::after {
+  content: "• Write something here";
+  display: block;
+  padding-left: 18px;
+  position: relative;
+}
+
+.consonant-Card .consonant-CardFooter:empty::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #333;
+}
+
+/* =========================
+   ICON MAPPINGS
+   ========================= */
+
+.consonant-Card .card-icon.icon-school {
   background-image: url('https://adobe.sharepoint.com/sites/HelixProjects/Shared%20Documents/sites/berufsbildung-basel/lehre-site/icons/school-svgrepo-com.svg');
 }
 
-.card-icon.icon-center {
-  background-image: url('https://adobe.sharepoint.com/sites/HelixProjects/Shared%20Documents/sites/berufsbildung-basel/lehre-site/icons/school-svgrepo-com.svg');
+.consonant-Card .card-icon.icon-center {
+  background-image: url('https://adobe.sharepoint.com/sites/HelixProjects/Shared%20Documents/sites/berufsbildung-basel/lehre-site/icons/center-text-bubble-svgrepo-com.svg');
+}
+
+/* Add more icons here */
+.consonant-Card .card-icon.icon-desktop {
+  background-image: url('https://example.com/icons/desktop.svg');
+}
+
+.consonant-Card .card-icon.icon-button {
+  background-image: url('https://example.com/icons/button.svg');
 }
