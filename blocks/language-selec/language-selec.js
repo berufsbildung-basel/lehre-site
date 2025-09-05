@@ -3,7 +3,7 @@ import { getLibs } from '../../scripts/scripts.js';
 // import { createTag, getConfig, getLanguage, loadLanguageConfig } from '../../utils/utils.js';
 
 const miloLibs = getLibs();
-const { createTag, getConfig, getLanguage, loadLanguageConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { createTag, getConfig, getLanguage, loadLanguageConfig, loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 
 
 const queriedPages = [];
@@ -546,6 +546,12 @@ function setupDropdownEvents({
 
 export default async function init(block) {
   const config = getConfig();
+  const { codeRoot } = config;
+  const base = miloLibs || codeRoot;
+  
+  // Load the CSS for this block
+  loadStyle(`${base}/blocks/language-selec/language-selec.css`);
+  
   const { languages, locales } = config;
   const divs = block.querySelectorAll(':scope > div');
   const links = divs[0].querySelectorAll('a');
