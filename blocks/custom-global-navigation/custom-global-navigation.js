@@ -16,7 +16,7 @@ import {
 
 const cssPromise = (async () => {
   const { miloLibs, codeRoot, theme } = getConfig();
-  const url = `${miloLibs || codeRoot}/blocks/global-navigation/`;
+  const url = `${miloLibs || codeRoot}/blocks/custom-global-navigation/`;
   const loadStylePromise = (u) => new Promise((resolve, reject) => {
     loadStyle(u, (e) => {
       if (e === 'error') return reject(u);
