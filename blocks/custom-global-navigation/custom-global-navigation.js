@@ -15,8 +15,8 @@ import {
 } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
 const cssPromise = (async () => {
-  const { miloLibs, codeRoot, theme } = getConfig();
-  const url = `${miloLibs || codeRoot}/blocks/custom-global-navigation/`;
+  const { codeRoot, theme } = getConfig();
+  const url = `${codeRoot}/blocks/custom-global-navigation/`;
   const loadStylePromise = (u) => new Promise((resolve, reject) => {
     loadStyle(u, (e) => {
       if (e === 'error') return reject(u);

@@ -1,6 +1,6 @@
-import { getConfig, getFedsPlaceholderConfig } from '../../../../utils/utils.js';
+import { getConfig, getFedsPlaceholderConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 import { toFragment, trigger, closeAllDropdowns, logErrorFor } from '../../utilities/utilities.js';
-import { replaceKeyArray } from '../../../../features/placeholders.js';
+import { replaceKeyArray } from 'https://main--milo--adobecom.aem.live/libs/features/placeholders.js';
 
 const getLanguage = (ietfLocale) => {
   if (!ietfLocale.length) return 'en';

@@ -10,9 +10,9 @@ import {
   getFederatedContentRoot,
   getFederatedUrl,
   getFedsPlaceholderConfig,
-} from '../../../utils/utils.js';
-import { replaceKey, replaceText, fetchPlaceholders } from '../../../features/placeholders.js';
-import { PERSONALIZATION_TAGS, FLAGS, handleCommands } from '../../../features/personalization/personalization.js';
+} from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
+import { replaceKey, replaceText, fetchPlaceholders } from 'https://main--milo--adobecom.aem.live/libs/features/placeholders.js';
+import { PERSONALIZATION_TAGS, FLAGS, handleCommands } from 'https://main--milo--adobecom.aem.live/libs/features/personalization/personalization.js';
 
 loadLana();
 
@@ -504,7 +504,7 @@ export async function fetchAndProcessPlainHtml({
   }
   const inlineFrags = [...body.querySelectorAll('a[href*="#_inline"]')];
   if (inlineFrags.length) {
-    const { default: loadInlineFrags } = await import('../../fragment/fragment.js');
+    const { default: loadInlineFrags } = await import('https://main--milo--adobecom.aem.live/libs/blocks/fragment/fragment.js');
     const fragPromises = inlineFrags.map((link) => {
       link.href = getFederatedUrl(localizeLink(link.href));
       return loadInlineFrags(link);
@@ -520,7 +520,7 @@ export async function fetchAndProcessPlainHtml({
 
   const blocks = body.querySelectorAll('.martech-metadata');
   if (blocks.length) {
-    import('../../martech-metadata/martech-metadata.js')
+    import('https://main--milo--adobecom.aem.live/libs/martech-metadata/martech-metadata.js')
       .then(({ default: decorate }) => blocks.forEach((block) => decorate(block)))
       .catch((e) => {
         lanaLog({
@@ -569,7 +569,7 @@ export const closeAllTabs = (tabs, tabpanels) => {
 
 let processTrackingLabels;
 const getAnalyticsValue = async (str, index) => {
-  processTrackingLabels = processTrackingLabels ?? (await import('../../../martech/attributes.js')).processTrackingLabels;
+  processTrackingLabels = processTrackingLabels ?? (await import('https://main--milo--adobecom.aem.live/libs/martech/attributes.js')).processTrackingLabels;
 
   if (typeof str !== 'string' || !str.length) return str;
 
