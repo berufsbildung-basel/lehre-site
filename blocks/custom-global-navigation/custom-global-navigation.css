@@ -1551,7 +1551,7 @@ header.new-nav .feds-nav > section.feds-navItem > .feds-popup.loading .tabs butt
   margin: 0px 28px;
 }
 
-.feds-navLink {
+.feds-navLink .feds-brand-label{
   text-decoration-line: none;
 }
 
