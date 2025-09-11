@@ -12,7 +12,7 @@ import {
   getFederatedUrl,
   getFedsPlaceholderConfig,
   shouldBlockFreeTrialLinks,
-} from '../../utils/utils.js';
+} from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
 const cssPromise = (async () => {
   const { miloLibs, codeRoot, theme } = getConfig();
@@ -56,10 +56,10 @@ const asideJsPromise = getMetadata('gnav-promo-source') ? import('./features/asi
 const breadCrumbsJsPromise = document.querySelector('header')?.classList.contains('has-breadcrumbs') ? import('./features/breadcrumbs/breadcrumbs.js') : null;
 
 const [utilities, placeholders, merch, { processTrackingLabels }] = await Promise.all([
-  import('./utilities/utilities.js'),
-  import('../../features/placeholders.js'),
-  import('../merch/merch.js'),
-  import('../../martech/attributes.js'),
+  import('./utilities/utilities.js'), // this one is YOUR local file, keep it
+  import('https://main--milo--adobecom.aem.live/libs/features/placeholders.js'),
+  import('https://main--milo--adobecom.aem.live/libs/blocks/merch/merch.js'),
+  import('https://main--milo--adobecom.aem.live/libs/martech/attributes.js'),
 ]);
 
 const { replaceKey, replaceKeyArray } = placeholders;
