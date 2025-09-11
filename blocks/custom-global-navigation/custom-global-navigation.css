@@ -927,7 +927,7 @@ header.new-nav .feds-nav > .feds-navItem > a.feds-navLink {
   color: var(--feds-color-white-v2);
 }
 
-/* 
+/*
 
 /* Mega Menu */
 
@@ -1480,12 +1480,12 @@ html:has(body.disable-ios-scroll) { /* this class is only added on iOS */
 .feds-popup.loading .first-headline-one,
 .feds-popup.loading .first-headline-two,
 .feds-popup.loading .feds-navLink-content .feds-navLink-title,
-.feds-popup.loading .feds-navLink-content .feds-navLink-description, 
+.feds-popup.loading .feds-navLink-content .feds-navLink-description,
 .feds-popup.loading .feds-cta-wrapper,
 .feds-popup.loading .feds-menu-headline:not(:has(div)),
 .feds-popup.loading .feds-crossCloudMenu-item .feds-navLink,
 header.new-nav .feds-nav > section.feds-navItem > .feds-popup.loading .feds-navLink-content .feds-navLink-title,
-header.new-nav .feds-nav > section.feds-navItem > .feds-popup.loading .feds-navLink-content .feds-navLink-description, 
+header.new-nav .feds-nav > section.feds-navItem > .feds-popup.loading .feds-navLink-content .feds-navLink-description,
 header.new-nav .feds-nav > section.feds-navItem > .feds-popup.loading .tabs button > div {
   border-radius: 2px;
   opacity: var(--feds-skeleton-opacity);
@@ -1549,6 +1549,10 @@ header.new-nav .feds-nav > section.feds-navItem > .feds-popup.loading .tabs butt
   width: 84px;
   padding: 0px;
   margin: 0px 28px;
+}
+
+.feds-navLink {
+  text-decoration-line: none;
 }
 
 header.new-nav .feds-nav > section.feds-navItem > .feds-popup.loading .tabs button > div {
