@@ -751,7 +751,7 @@
   .formen .step-navigation {
     justify-content: space-between;
   }
-  
+
   .formen .step-btn {
     width: auto;
     min-width: 120px;
@@ -772,14 +772,14 @@
     gap: 16px;
     align-items: start;
   }
-  
+
   .formen .form-step[data-step="4"] .field-wrapper label {
     margin-bottom: 0;
     padding-top: 12px;
     font-weight: 600;
     color: var(--gray-700);
   }
-  
+
   .formen form {
     display: block;
   }
@@ -787,38 +787,38 @@
   .formen h2 {
     font-size: 24px;
   }
-  
+
   .formen .step-indicator {
     padding: 0 16px;
     margin-bottom: 32px;
     justify-self: center;
   }
-  
+
   .formen .step {
     width: 40px;
     height: 40px;
   }
-  
+
   .formen .step-number {
     font-size: 14px;
   }
-  
+
   .formen .step-navigation {
-    flex-direction: column;
+    flex-direction: column-reverse;
     gap: 12px;
   }
-  
+
   .formen .step-btn {
     width: 100%;
     min-width: auto;
   }
-  
+
   .formen .file-drop-zone {
     padding: 24px 16px;
   }
 }
 
-@media screen and (min-width: 900px) { 
+@media screen and (min-width: 900px) {
   .formen .field-wrapper {
     display: flex;
   }
@@ -826,21 +826,21 @@
   .formen label {
     width: 72%;
   }
-  
+
   .formen .field-file-wrapper {
     flex-direction: column;
     box-sizing: border-box;
   }
-  
+
   .formen .step-indicator {
     padding: 0 48px;
   }
-  
+
   .formen .step-navigation {
     justify-content: center;
     gap: 24px;
   }
-  
+
   .formen .step-btn {
     min-width: 140px;
   }
@@ -957,7 +957,7 @@
     gap: 16px;
     align-items: start;
   }
-  
+
   .formen .form-step[data-step="4"] .field-wrapper label {
     margin-bottom: 0;
     padding-top: 12px;

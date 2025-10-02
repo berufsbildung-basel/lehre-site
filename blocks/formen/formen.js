@@ -13,7 +13,7 @@ const RULE_OPERATORS = {
   excludes: 'exc',
 };
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB limit
 
 const miloLibs = getLibs();
 const { createTag } = await import(`${miloLibs}/utils/utils.js`);
@@ -287,12 +287,12 @@ function createInput({ type, field, placeholder, required, defval, format }) {
 
 function createFileInput({ field, required }) {
   const wrapper = createTag('div', { class: 'file-upload-wrapper' });
-  
+
   let acceptTypes = '.pdf';
   if (field === 'profilePicture') {
     acceptTypes = '.jpg,.jpeg,.png,.gif,.webp';
   }
-  
+
   const input = createTag('input', { type: 'file', id: field, multiple: true, accept: acceptTypes });
   if (required === 'x') input.setAttribute('required', 'required');
 
@@ -305,7 +305,7 @@ function createFileInput({ field, required }) {
 
   // error message container for the CSS styling
   const errorMessage = createTag('div', { class: 'file-error-message' });
-  
+
   // displays the files which are attached to the form
   const fileList = createTag('div', { class: 'file-list' });
 
@@ -331,22 +331,22 @@ function createFileInput({ field, required }) {
   dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    
+
     // added this for the drop zone to check if the files are the correct type
     const files = Array.from(e.dataTransfer.files);
     const invalidFiles = files.filter(file => {
       const ext = file.name.split('.').pop().toLowerCase();
-      return field === 'profilePicture' ? 
-        !['jpg','jpeg','png','gif','webp'].includes(ext) : 
+      return field === 'profilePicture' ?
+        !['jpg','jpeg','png','gif','webp'].includes(ext) :
         ext !== 'pdf';
     });
-    
+
     // exception which triggers error message underneath the drop zone if the files are not the correct type
     if (invalidFiles.length > 0) {
       showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
       return;
     }
-    
+
     input.files = e.dataTransfer.files;
     updateFileList();
   });
@@ -376,11 +376,11 @@ function createFileInput({ field, required }) {
   input.addEventListener('change', (e) => {
     const invalidFiles = Array.from(e.target.files).filter(file => {
       const ext = file.name.split('.').pop().toLowerCase();
-      return field === 'profilePicture' ? 
-        !['jpg','jpeg','png','gif','webp'].includes(ext) : 
+      return field === 'profilePicture' ?
+        !['jpg','jpeg','png','gif','webp'].includes(ext) :
         ext !== 'pdf';
     });
-    
+
     if (invalidFiles.length > 0) {
       showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
       e.target.value = ''; // clears the files form the input field
@@ -400,8 +400,6 @@ function formatFileSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
 }
-
-// the steps arent properly implemented yet, due to there only being the one single page on the form page (the steps are implemented now)
 
 function createStepIndicator(totalSteps, currentStep) {
   const wrapper = createTag('div', { class: 'step-indicator' });
@@ -496,11 +494,10 @@ function populateSummary(form) {
   // gets all the form data
   const formData = constructPayload(form);
   const { payload, files } = formData;
-  
+
   // populates the text and select summary fields
   const summaryMappings = {
     'summaryGender': 'gender',
-    'summaryFirstName': 'firstName', 
     'summaryLastName': 'lastName',
     'summaryBirth': 'birth',
     'summaryEmail': 'email',
@@ -509,7 +506,7 @@ function populateSummary(form) {
     'summaryProjectUrls': 'projectUrls',
     'summaryAdditionalMessage': 'additionalMessage'
   };
-  
+
   // populates the text fields
   Object.keys(summaryMappings).forEach(summaryField => {
     const originalField = summaryMappings[summaryField];
@@ -519,17 +516,17 @@ function populateSummary(form) {
       summaryElement.textContent = value;
     }
   });
-  
+
   // populates the file summary fields
   const fileSummaryMappings = {
     'summaryCv': 'cv',
-    'summaryProfilePicture': 'profilePicture', 
+    'summaryProfilePicture': 'profilePicture',
     'summaryMotivation': 'motivation',
     'summaryCertificates': 'certificates',
     'summaryMulticheck': 'multicheck',
     'summaryAdditionalDocs': 'additionalDocs'
   };
-  
+
   Object.keys(fileSummaryMappings).forEach(summaryField => {
     const originalField = fileSummaryMappings[summaryField];
     const summaryElement = form.querySelector(`#${summaryField}_display`);
@@ -539,10 +536,10 @@ function populateSummary(form) {
         const fileCount = files[originalField].length;
         const fileNames = files[originalField].map(f => f.name).join(', ');
         fileIndicator.innerHTML = `${fileCount} file(s): ${fileNames}`;
-        fileIndicator.style.color = '#10b981'; 
+        fileIndicator.style.color = '#10b981';
       } else {
         fileIndicator.innerHTML = 'No files attached';
-        fileIndicator.style.color = '#6b7280'; 
+        fileIndicator.style.color = '#6b7280';
       }
     }
   });
@@ -596,35 +593,35 @@ function createTextArea({ field, placeholder, required, defval }) {
 }
 
 function createSummaryField({ field, label, required }) {
-  const div = createTag('div', { 
-    class: 'summary-value', 
+  const div = createTag('div', {
+    class: 'summary-value',
     'data-summary-for': field.replace('summary', '').toLowerCase(),
     id: `${field}_display`
   });
   div.textContent = '—'; // placeholder until populated
-  
+
   if (required === 'x') {
     div.classList.add('required-field');
   }
-  
+
   return div;
 }
 
 function createFileSummaryField({ field, label, required }) {
-  const div = createTag('div', { 
-    class: 'file-summary-value', 
+  const div = createTag('div', {
+    class: 'file-summary-value',
     'data-summary-for': field.replace('summary', '').toLowerCase(),
     id: `${field}_display`
   });
-  
+
   const fileIndicator = createTag('div', { class: 'file-summary-indicator' });
   fileIndicator.innerHTML = 'No files attached';
   div.append(fileIndicator);
-  
+
   if (required === 'x') {
     div.classList.add('required-field');
   }
-  
+
   return div;
 }
 
