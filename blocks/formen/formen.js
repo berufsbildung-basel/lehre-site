@@ -2,6 +2,8 @@ import { getLibs } from '../../scripts/scripts.js';
 
 /* global turnstile */
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+
 const RULE_OPERATORS = {
   equal: '=',
   notEqual: '!=',
@@ -300,7 +302,15 @@ function createFileInput({ field, required }) {
   dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    input.files = e.dataTransfer.files;
+    const files = e.dataTransfer.files;
+    for (const f of files) {
+      if (f.size > MAX_FILE_SIZE) {
+        input.value = '';
+        fileList.innerHTML = '';
+        return;
+      }
+    }
+    input.files = files;
     updateFileList();
   });
 
@@ -326,7 +336,17 @@ function createFileInput({ field, required }) {
     });
   }
 
-  input.addEventListener('change', updateFileList);
+  input.addEventListener('change', (e) => {
+    const files = e.target.files;
+    for (const f of files) {
+      if (f.size > MAX_FILE_SIZE) {
+        input.value = '';
+        fileList.innerHTML = '';
+        return;
+      }
+    }
+    updateFileList();
+  });
 
   wrapper.append(input, dropZone, fileList);
   return wrapper;
