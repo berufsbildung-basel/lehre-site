@@ -261,13 +261,19 @@ function createHeading({ label }, el) {
   return createTag(el, {}, label);
 }
 
-function createInput({ type, field, placeholder, required, defval, format }) {
-  const input = createTag('input', { type, id: field, placeholder, value: defval && defval !== 'undefined' ? defval : '' });
+function createInput({
+  type, field, placeholder, required, defval, format,
+}) {
+  const input = createTag('input', {
+    type,
+    id: field,
+    placeholder,
+    value: defval && defval !== 'undefined' ? defval : '',
+  });
 
   if (format && format.trim()) {
     input.setAttribute('pattern', format);
-    // these are for the verification of the proper input formats
-    if (field === 'number') {
+    if (type === 'tel' || (field && field.toLowerCase().includes('phone'))) {
       input.setAttribute('title', 'Please enter a valid phone number');
     } else if (type === 'email') {
       input.setAttribute('title', 'Please enter a valid email address');
@@ -275,15 +281,28 @@ function createInput({ type, field, placeholder, required, defval, format }) {
       input.setAttribute('title', 'Please match the required format');
     }
   }
-  // this takes care of the max limit of the date so you cant set a birth date in the future
+
   if (type === 'date') {
     const today = new Date().toISOString().split('T')[0];
     input.setAttribute('max', today);
   }
 
-  if (required === 'x') input.setAttribute('required', 'required');
+  if (required === 'x') {
+    input.setAttribute('required', 'required');
+  }
+
+  const isUrlField =
+    type === 'url' ||
+    (field && field.toLowerCase().includes('url')) ||
+    (typeof placeholder === 'string' && placeholder.toLowerCase().includes('http'));
+
+  if (isUrlField) {
+    attachOptionalUrlValidation(input);
+  }
+
   return input;
 }
+
 
 function createFileInput({ field, required }) {
   const wrapper = createTag('div', { class: 'file-upload-wrapper' });
@@ -334,11 +353,11 @@ function createFileInput({ field, required }) {
 
     // added this for the drop zone to check if the files are the correct type
     const files = Array.from(e.dataTransfer.files);
-    const invalidFiles = files.filter(file => {
+    const invalidFiles = files.filter((file) => {
       const ext = file.name.split('.').pop().toLowerCase();
-      return field === 'profilePicture' ?
-        !['jpg','jpeg','png','gif','webp'].includes(ext) :
-        ext !== 'pdf';
+      return field === 'profilePicture'
+        ? !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
+        : ext !== 'pdf';
     });
 
     // exception which triggers error message underneath the drop zone if the files are not the correct type
@@ -374,11 +393,11 @@ function createFileInput({ field, required }) {
   }
 
   input.addEventListener('change', (e) => {
-    const invalidFiles = Array.from(e.target.files).filter(file => {
+    const invalidFiles = Array.from(e.target.files).filter((file) => {
       const ext = file.name.split('.').pop().toLowerCase();
-      return field === 'profilePicture' ?
-        !['jpg','jpeg','png','gif','webp'].includes(ext) :
-        ext !== 'pdf';
+      return field === 'profilePicture'
+        ? !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
+        : ext !== 'pdf';
     });
 
     if (invalidFiles.length > 0) {
@@ -482,7 +501,7 @@ function navigateStep(form, targetStep) {
   if (window.innerWidth < 1200) {
     form.scrollIntoView({
       behavior: 'smooth',
-      block: 'start'
+      block: 'start',
     });
   }
 
@@ -497,18 +516,18 @@ function populateSummary(form) {
 
   // populates the text and select summary fields
   const summaryMappings = {
-    'summaryGender': 'gender',
-    'summaryLastName': 'lastName',
-    'summaryBirth': 'birth',
-    'summaryEmail': 'email',
-    'summaryNumber': 'number',
-    'summaryMotivationText': 'motivationText',
-    'summaryProjectUrls': 'projectUrls',
-    'summaryAdditionalMessage': 'additionalMessage'
+    summaryGender: 'gender',
+    summaryLastName: 'lastName',
+    summaryBirth: 'birth',
+    summaryEmail: 'email',
+    summaryNumber: 'number',
+    summaryMotivationText: 'motivationText',
+    summaryProjectUrls: 'projectUrls',
+    summaryAdditionalMessage: 'additionalMessage',
   };
 
   // populates the text fields
-  Object.keys(summaryMappings).forEach(summaryField => {
+  Object.keys(summaryMappings).forEach((summaryField) => {
     const originalField = summaryMappings[summaryField];
     const summaryElement = form.querySelector(`#${summaryField}_display`);
     if (summaryElement) {
@@ -519,22 +538,22 @@ function populateSummary(form) {
 
   // populates the file summary fields
   const fileSummaryMappings = {
-    'summaryCv': 'cv',
-    'summaryProfilePicture': 'profilePicture',
-    'summaryMotivation': 'motivation',
-    'summaryCertificates': 'certificates',
-    'summaryMulticheck': 'multicheck',
-    'summaryAdditionalDocs': 'additionalDocs'
+    summaryCv: 'cv',
+    summaryProfilePicture: 'profilePicture',
+    summaryMotivation: 'motivation',
+    summaryCertificates: 'certificates',
+    summaryMulticheck: 'multicheck',
+    summaryAdditionalDocs: 'additionalDocs',
   };
 
-  Object.keys(fileSummaryMappings).forEach(summaryField => {
+  Object.keys(fileSummaryMappings).forEach((summaryField) => {
     const originalField = fileSummaryMappings[summaryField];
     const summaryElement = form.querySelector(`#${summaryField}_display`);
     if (summaryElement) {
       const fileIndicator = summaryElement.querySelector('.file-summary-indicator');
       if (files[originalField] && files[originalField].length > 0) {
         const fileCount = files[originalField].length;
-        const fileNames = files[originalField].map(f => f.name).join(', ');
+        const fileNames = files[originalField].map((f) => f.name).join(', ');
         fileIndicator.innerHTML = `${fileCount} file(s): ${fileNames}`;
         fileIndicator.style.color = '#10b981';
       } else {
@@ -548,17 +567,55 @@ function populateSummary(form) {
 function validateCurrentStep(form, step) {
   const stepElement = form.querySelector(`[data-step="${step}"]`);
   const requiredFields = stepElement.querySelectorAll('[required]');
+  const optionalPatternFields = Array.from(
+    stepElement.querySelectorAll(
+      'input[pattern]:not([required]), textarea[pattern]:not([required]), select[pattern]:not([required])'
+    )
+  ).filter((el) => (el.value || '').trim().length > 0);
 
   let valid = true;
-  requiredFields.forEach((field) => {
+  [...requiredFields, ...optionalPatternFields].forEach((field) => {
     if (!field.checkValidity()) {
       field.reportValidity();
+      field.setAttribute('aria-invalid', 'true');
       valid = false;
+    } else {
+      field.removeAttribute('aria-invalid');
     }
   });
 
   return valid;
 }
+
+
+const OPTIONAL_URL_PATTERN = /^(https?:\/\/(?:[a-z0-9-]+\.)+[a-z]{2,}(?:[\/?#][^\s]*)?|)$/i;
+
+function attachOptionalUrlValidation(input) {
+  input.setAttribute(
+    'pattern',
+    '^(https?:\\/\\/(?:[a-z0-9-]+\\.)+[a-z]{2,}(?:[\\/?#][^\\s]*)?|)$'
+  );
+  input.setAttribute('title', 'Please enter a valid URL or leave blank.');
+
+  input.addEventListener('input', () => {
+    const v = input.value.trim();
+    if (v === '') {
+      input.setCustomValidity('');
+    } else if (!/^(https?:\/\/(?:[a-z0-9-]+\.)+[a-z]{2,}(?:[\/?#][^\s]*)?)$/i.test(v)) {
+      input.setCustomValidity('Bitte gib eine gültige URL ein oder lasse das Feld leer.');
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+
+  input.addEventListener('blur', () => {
+    const v = input.value.trim();
+    if (v !== '' && !OPTIONAL_URL_PATTERN.test(v)) {
+      input.reportValidity();
+    }
+  });
+}
+
 
 function getTotalSteps(form) {
   return form.querySelectorAll('.form-step').length;
@@ -586,6 +643,8 @@ function loadFormDataFromSession(form) {
   }
 }
 
+
+
 function createTextArea({ field, placeholder, required, defval }) {
   const input = createTag('textarea', { id: field, placeholder, value: defval });
   if (required === 'x') input.setAttribute('required', 'required');
@@ -596,7 +655,7 @@ function createSummaryField({ field, label, required }) {
   const div = createTag('div', {
     class: 'summary-value',
     'data-summary-for': field.replace('summary', '').toLowerCase(),
-    id: `${field}_display`
+    id: `${field}_display`,
   });
   div.textContent = '—'; // placeholder until populated
 
@@ -611,7 +670,7 @@ function createFileSummaryField({ field, label, required }) {
   const div = createTag('div', {
     class: 'file-summary-value',
     'data-summary-for': field.replace('summary', '').toLowerCase(),
-    id: `${field}_display`
+    id: `${field}_display`,
   });
 
   const fileIndicator = createTag('div', { class: 'file-summary-indicator' });
