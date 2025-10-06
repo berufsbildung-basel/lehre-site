@@ -89,9 +89,25 @@ const miloLibs = setLibs(LIBS);
   });
 }());
 
+//checks if document uses map-iframe web-component
+function needsMapIframe(root = document) {
+  if ([...root.querySelectorAll('a,p,span,div')].some(el => (el.textContent || '').trim() === '(map-iframe)')) return true;
+  return !!root.querySelector('a[href*="google.com/maps"]');
+
+}
+
 (async function loadPage() {
   const { loadArea, setConfig } = await import(`${miloLibs}/utils/utils.js`);
-  const config = setConfig({ ...CONFIG, miloLibs });
-  console.log(config);
+  setConfig({ ...CONFIG, miloLibs });
   await loadArea();
+
+//if map-iframe is used, it calls it
+  if (needsMapIframe(document)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/web-components/map-iframe/map-iframe.css';
+    document.head.append(link);
+
+    await import('/web-components/map-iframe/map-iframe.js');
+  }
 }());
