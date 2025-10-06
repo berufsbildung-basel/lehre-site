@@ -26,7 +26,7 @@ export const [setLibs, getLibs] = (() => {
   ];
 })();
 
-function decorateArea(area = document) {
+function decorateArea() {
   const eagerLoad = (parent, selector) => {
     const img = parent.querySelector(selector);
     img?.removeAttribute('loading');
@@ -89,11 +89,10 @@ const miloLibs = setLibs(LIBS);
   });
 }());
 
-//checks if document uses map-iframe web-component
+// checks if document uses map-iframe web-component
 function needsMapIframe(root = document) {
-  if ([...root.querySelectorAll('a,p,span,div')].some(el => (el.textContent || '').trim() === '(map-iframe)')) return true;
+  if ([...root.querySelectorAll('a,p,span,div')].some((el) => (el.textContent || '').trim() === '(map-iframe)')) return true;
   return !!root.querySelector('a[href*="google.com/maps"]');
-
 }
 
 (async function loadPage() {
@@ -101,13 +100,13 @@ function needsMapIframe(root = document) {
   setConfig({ ...CONFIG, miloLibs });
   await loadArea();
 
-//if map-iframe is used, it calls it
+  // if map-iframe is used, it calls it
   if (needsMapIframe(document)) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = '/web-components/map-iframe/map-iframe.css';
     document.head.append(link);
 
-    await import('/web-components/map-iframe/map-iframe.js');
+    await import('../web-components/map-iframe/map-iframe.js');
   }
 }());

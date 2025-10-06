@@ -27,6 +27,14 @@ module.exports = {
       files: ['test/**/*.js'],
       rules: { 'no-console': 'off' },
     },
+    {
+      files: ['**/test-runner.config.js', '**/web-test-runner.config.js', '**/wtr.config.js'],
+      rules: {
+        'import/no-extraneous-dependencies': [
+          'error', { devDependencies: true },
+        ],
+      },
+    },
   ],
   plugins: [
     'chai-friendly',

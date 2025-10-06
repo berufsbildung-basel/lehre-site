@@ -16,9 +16,9 @@
 
   padding: var(--spacing-xl);
   border-radius: 16px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border: solid 1px rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
+  border: solid 1px rgb(255 255 255 / 80%);
   box-sizing: border-box;
   max-width: 900px;
   margin: 0 auto;
@@ -27,6 +27,7 @@
   color: var(--gray-800);
   position: relative;
   overflow: hidden;
+  animation: form-slide-in 0.6s ease;
 }
 
 .formen::before {
@@ -47,15 +48,14 @@
 }
 
 .formen h2 {
-  padding: 0 0 24px 0;
+  padding: 0 0 24px;
   font-size: 28px;
   font-weight: 700;
   color: var(--gray-800);
   text-align: center;
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--success-color) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 32px;
   position: relative;
 }
@@ -73,7 +73,7 @@
 }
 
 .formen h3 {
-  padding: 16px 0 8px 0;
+  padding: 16px 0 8px;
   font-size: 20px;
   font-weight: 600;
   color: var(--gray-700);
@@ -88,9 +88,9 @@
   font-size: 16px;
   line-height: 1.5;
   font-family: var(--body-font-family);
-  background-color: #ffffff;
+  background-color: #fff;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
 .formen textarea {
@@ -100,13 +100,13 @@
 
 .formen :is(input, textarea, select):hover {
   border-color: var(--gray-300);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 12%);
 }
 
 .formen :is(input, textarea, select):is(:focus, :focus-visible, :focus-within, :active) {
   border-color: var(--primary-color);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1), 0 4px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 10%), 0 4px 8px rgb(0 0 0 / 12%);
   transform: translateY(-1px);
 }
 
@@ -261,7 +261,7 @@
   color: #fff;
   font-weight: 600;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 12px rgb(37 99 235 / 25%);
   margin: 0 auto;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -271,13 +271,13 @@
 
 .formen button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 20px rgb(37 99 235 / 35%);
   background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
 }
 
 .formen button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 2px 8px rgb(37 99 235 / 25%);
 }
 
 .formen button:disabled {
@@ -299,7 +299,7 @@
   background-color: var(--primary-color);
   color: white;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 12px rgb(37 99 235 / 25%);
 }
 
 .formen .thank-you {
@@ -310,16 +310,17 @@
   border-radius: var(--input-border-radius);
   font-weight: 600;
   font-size: 18px;
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-  animation: slideInSuccess 0.5s ease;
+  box-shadow: 0 8px 25px rgb(16 185 129 / 30%);
+  animation: slide-in-success 0.5s ease;
 }
 
 /* Loading animation */
-@keyframes slideInSuccess {
+@keyframes slide-in-success {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -350,21 +351,20 @@
   0% {
     transform: translate(-50%, -50%) rotate(0deg);
   }
+
   100% {
     transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
 /* form entrance load in animation */
-.formen {
-  animation: formSlideIn 0.6s ease;
-}
 
-@keyframes formSlideIn {
+@keyframes form-slide-in {
   from {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -426,7 +426,7 @@
   width: 0%;
   transition: width 0.5s ease;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgb(37 99 235 / 30%);
 }
 
 .formen .steps-wrapper {
@@ -445,14 +445,14 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  border: 3px solid #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
 }
 
 .formen .step.active {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 6px 20px rgb(37 99 235 / 30%);
 }
 
 .formen .step-number {
@@ -507,7 +507,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 20%), transparent);
   transition: left 0.5s ease;
 }
 
@@ -515,7 +515,7 @@
   background-color: var(--primary-color);
   color: white;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 12px rgb(37 99 235 / 25%);
 }
 
 .formen .step-btn:hover::before {
@@ -531,7 +531,7 @@
 .formen .step-next:hover {
   background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 20px rgb(37 99 235 / 35%);
 }
 
 .formen .step-back {
@@ -568,7 +568,7 @@
   border-radius: var(--input-border-radius);
   padding: 32px 24px;
   text-align: center;
-  background: linear-gradient(135deg, var(--gray-50) 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--gray-50) 0%, #fff 100%);
   transition: all 0.3s ease;
   cursor: pointer;
   margin-bottom: 16px;
@@ -583,16 +583,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle at center, rgb(37 99 235 / 5%) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .formen .file-drop-zone:hover {
   border-color: var(--primary-color);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgb(37 99 235 / 5%) 0%, #fff 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgb(0 0 0 / 10%);
 }
 
 .formen .file-drop-zone:hover::before {
@@ -601,9 +601,9 @@
 
 .formen .file-drop-zone.drag-over {
   border-color: var(--success-color);
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgb(16 185 129 / 10%) 0%, #fff 100%);
   transform: scale(1.02);
-  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 12px 30px rgb(16 185 129 / 20%);
 }
 
 .formen .attach-file-btn {
@@ -620,7 +620,7 @@
   align-items: center;
   align-content: center;
   gap: 8px;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 12px rgb(37 99 235 / 25%);
   transition: all 0.2s ease;
 }
 
@@ -630,7 +630,7 @@
 
 .formen .attach-file-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 20px rgb(37 99 235 / 35%);
   background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
 }
 
@@ -655,13 +655,13 @@
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #ffffff 0%, var(--gray-50) 100%);
+  background: linear-gradient(135deg, #fff 0%, var(--gray-50) 100%);
   border: 1px solid var(--gray-200);
   border-radius: var(--input-border-radius);
   margin-bottom: 8px;
   font-size: 14px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
@@ -669,7 +669,7 @@
 
 .formen .file-item:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   border-color: var(--gray-300);
 }
 
@@ -730,17 +730,18 @@
   font-weight: 500;
   margin-top: 8px;
   padding: 8px 12px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgb(239 68 68 / 10%);
+  border: 1px solid rgb(239 68 68 / 20%);
   border-radius: 6px;
-  animation: errorSlideIn 0.3s ease;
+  animation: error-slide-in 0.3s ease;
 }
 
-@keyframes errorSlideIn {
+@keyframes error-slide-in {
   from {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -761,7 +762,7 @@
 /* Mobile optimizations */
 @media screen and (max-width: 600px) {
   .formen {
-    padding: 24px 24px;
+    padding: 24px;
     padding: 5%;
     margin: 16px;
     border-radius: 12px;
@@ -847,23 +848,24 @@
 }
 
 /* Summary step styling */
+
 /* bigger box */
 .formen .summary-field,
 .formen .file-summary-field {
-  background: linear-gradient(135deg, #ffffff 0%, var(--gray-50) 100%);
+  background: linear-gradient(135deg, #fff 0%, var(--gray-50) 100%);
   border: 1px solid var(--gray-200);
   border-radius: var(--input-border-radius);
   padding: 16px;
   margin-bottom: 16px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
   box-sizing: border-box;
 }
 
 .formen .summary-field:hover,
 .formen .file-summary-field:hover {
   border-color: var(--gray-300);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   transform: translateY(-1px);
 }
 
@@ -875,10 +877,10 @@
   line-height: 1.5;
   min-height: 24px;
   padding: 8px 12px;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid var(--gray-200);
   border-radius: 6px;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 5%);
   box-sizing: border-box;
 }
 
@@ -890,10 +892,10 @@
 
 .formen .file-summary-value {
   padding: 12px;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid var(--gray-200);
   border-radius: 6px;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 5%);
   box-sizing: border-box;
 }
 
@@ -917,7 +919,7 @@
 
 /* summary section headers */
 .formen .summary-section {
-  margin: 32px 0 24px 0;
+  margin: 32px 0 24px;
   padding-bottom: 16px;
   border-bottom: 2px solid var(--gray-200);
 }
@@ -928,21 +930,21 @@
   color: var(--primary-color);
   margin: 0;
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--success-color) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Summary layout improvements */
 .formen .form-step[data-step="4"] {
-  animation: summarySlideIn 0.5s ease;
+  animation: summary-slide-in 0.5s ease;
 }
 
-@keyframes summarySlideIn {
+@keyframes summary-slide-in {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -974,8 +976,8 @@
   text-align: center;
   font-weight: 600;
   margin-bottom: 32px;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  animation: slideInSuccess 0.5s ease;
+  box-shadow: 0 4px 12px rgb(16 185 129 / 30%);
+  animation: slide-in-success 0.5s ease;
 }
 
 .formen .summary-complete::before {
@@ -983,7 +985,8 @@
   font-size: 20px;
   margin-right: 8px;
 }
-/* summary styling down to here*/
+
+/* summary styling down to here */
 
 .formen div.field-wrapper.form-submit-wrapper.form-step-3.field-button-wrapper {
   display: flex;
