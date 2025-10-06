@@ -13,6 +13,7 @@ const RULE_OPERATORS = {
   excludes: 'exc',
 };
 
+// eslint-disable-next-line no-unused-vars
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB limit
 
 const miloLibs = getLibs();
@@ -107,7 +108,7 @@ async function submitForm(formOrPayload) {
     let response;
 
     if (hasFiles) {
-      // creates FormData for multipart form submission, this is needed because the form data gets sent in json and the files need to be sent in an other format
+      // creates FormData for multipart form submission (files need different format than JSON)
       const formData = new FormData();
 
       // adds form fields
@@ -142,6 +143,7 @@ async function submitForm(formOrPayload) {
       throw new Error(`Error: ${response.statusText}`);
     }
 
+    // eslint-disable-next-line no-console
     console.log('POST request successful:', {
       status: response.status,
       statusText: response.statusText,
@@ -150,9 +152,11 @@ async function submitForm(formOrPayload) {
     });
 
     const result = await response.json();
+    // eslint-disable-next-line no-console
     console.log('Response from server:', result);
     return result;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Form submission failed:', error);
     return { status: 'error', message: error.message };
   }
@@ -168,9 +172,31 @@ function clearForm(form) {
   });
 }
 
-// currently the submit button works in a two step process of first loading the captcha and after the captcha you press it again to actually submit the form
-// lines 175-191 are actually meant for the multiple steps of the form application page but is currently not properly in use
+function getTotalSteps(form) {
+  return form.querySelectorAll('.form-step').length;
+}
 
+function validateCurrentStep(form, step) {
+  const stepElement = form.querySelector(`[data-step="${step}"]`);
+  const requiredFields = stepElement.querySelectorAll('[required]');
+
+  let valid = true;
+  requiredFields.forEach((field) => {
+    if (!field.checkValidity()) {
+      field.reportValidity();
+      valid = false;
+    }
+  });
+
+  return valid;
+}
+
+function saveFormDataToSession(form) {
+  const formData = constructPayload(form);
+  sessionStorage.setItem(`formData_${form.dataset.action}`, JSON.stringify(formData));
+}
+
+// submit button: two-step process (1. load captcha, 2. submit form)
 function createButton({ type, label }, thankYou) {
   const button = createTag('button', { class: 'button' }, label);
 
@@ -180,21 +206,22 @@ function createButton({ type, label }, thankYou) {
       const currentStep = parseInt(form.dataset.currentStep || '1', 10);
       const totalSteps = getTotalSteps(form);
 
-      // Validate current step before proceeding
+      // validates current step before proceeding
       if (!validateCurrentStep(form, currentStep)) {
         event.preventDefault();
         return;
       }
 
-      // if its not the last step it validates/ processes the current step and navigates to the next one (could also use a different method for proceeding to the next step)
+      // validates current step and navigates to next (if not last step)
       if (currentStep < totalSteps) {
         event.preventDefault();
         saveFormDataToSession(form);
+        // eslint-disable-next-line no-use-before-define
         navigateStep(form, currentStep + 1);
         return;
       }
 
-      // this is the part where the captcha is loaded after filling data out in the final step and pressing the submit button
+      // loads captcha after filling data out in final step and pressing submit button
       if (form.checkValidity()) {
         event.preventDefault();
 
@@ -206,7 +233,6 @@ function createButton({ type, label }, thankYou) {
             sitekey: '0x4AAAAAAA6uqp_nGspHkBq3',
             theme: 'light',
             callback: async (token) => {
-              console.log('Turnstile token:', token);
               form.dataset.turnstileToken = token;
               button.removeAttribute('disabled');
             },
@@ -218,13 +244,14 @@ function createButton({ type, label }, thankYou) {
 
         const token = form.dataset.turnstileToken;
         if (!token) {
+          // eslint-disable-next-line no-console
           console.error('Captcha not completed');
           return;
         }
 
         button.setAttribute('disabled', '');
         const formData = constructPayload(form);
-        formData.payload.turnstileToken = token; // includes the turnstile token in the payload of the form
+        formData.payload.turnstileToken = token; // includes turnstile token in the form payload
 
         const submission = await submitForm(form);
         button.removeAttribute('disabled');
@@ -232,7 +259,7 @@ function createButton({ type, label }, thankYou) {
         if (!submission) return;
         clearForm(form);
 
-        // Hide/remove the Turnstile widget after successful submission
+        // Hide/remove turnstile widget after successful submission
         const turnstileWidget = form.querySelector('.cf-turnstile');
         if (turnstileWidget) {
           turnstileWidget.remove();
@@ -261,7 +288,9 @@ function createHeading({ label }, el) {
   return createTag(el, {}, label);
 }
 
-function createInput({ type, field, placeholder, required, defval, format }) {
+function createInput({
+  type, field, placeholder, required, defval, format,
+}) {
   const input = createTag('input', { type, id: field, placeholder, value: defval && defval !== 'undefined' ? defval : '' });
 
   if (format && format.trim()) {
@@ -283,6 +312,14 @@ function createInput({ type, field, placeholder, required, defval, format }) {
 
   if (required === 'x') input.setAttribute('required', 'required');
   return input;
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
 }
 
 function createFileInput({ field, required }) {
@@ -328,29 +365,6 @@ function createFileInput({ field, required }) {
     dropZone.classList.remove('drag-over');
   });
 
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('drag-over');
-
-    // added this for the drop zone to check if the files are the correct type
-    const files = Array.from(e.dataTransfer.files);
-    const invalidFiles = files.filter(file => {
-      const ext = file.name.split('.').pop().toLowerCase();
-      return field === 'profilePicture' ?
-        !['jpg','jpeg','png','gif','webp'].includes(ext) :
-        ext !== 'pdf';
-    });
-
-    // exception which triggers error message underneath the drop zone if the files are not the correct type
-    if (invalidFiles.length > 0) {
-      showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
-      return;
-    }
-
-    input.files = e.dataTransfer.files;
-    updateFileList();
-  });
-
   function updateFileList() {
     fileList.innerHTML = '';
     Array.from(input.files).forEach((file, index) => {
@@ -373,17 +387,39 @@ function createFileInput({ field, required }) {
     });
   }
 
-  input.addEventListener('change', (e) => {
-    const invalidFiles = Array.from(e.target.files).filter(file => {
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+
+    // checks if the files are the correct type
+    const files = Array.from(e.dataTransfer.files);
+    const invalidFiles = files.filter((file) => {
       const ext = file.name.split('.').pop().toLowerCase();
-      return field === 'profilePicture' ?
-        !['jpg','jpeg','png','gif','webp'].includes(ext) :
-        ext !== 'pdf';
+      return field === 'profilePicture'
+        ? !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
+        : ext !== 'pdf';
     });
 
     if (invalidFiles.length > 0) {
       showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
-      e.target.value = ''; // clears the files form the input field
+      return;
+    }
+
+    input.files = e.dataTransfer.files;
+    updateFileList();
+  });
+
+  input.addEventListener('change', (e) => {
+    const invalidFiles = Array.from(e.target.files).filter((file) => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      return field === 'profilePicture'
+        ? !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
+        : ext !== 'pdf';
+    });
+
+    if (invalidFiles.length > 0) {
+      showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
+      e.target.value = ''; // clears the files from the input field
     }
 
     updateFileList();
@@ -393,12 +429,53 @@ function createFileInput({ field, required }) {
   return wrapper;
 }
 
-function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
+function navigateStep(form, targetStep) {
+  // hides the steps
+  form.querySelectorAll('.form-step').forEach((step) => {
+    step.style.display = 'none';
+  });
+
+  // shows target step
+  const targetStepElement = form.querySelector(`[data-step="${targetStep}"]`);
+  if (targetStepElement) {
+    targetStepElement.style.display = 'block';
+  }
+
+  // updates the step indicator (shows current step and progress bar)
+  const indicator = form.querySelector('.step-indicator');
+  if (indicator) {
+    const steps = indicator.querySelectorAll('.step');
+    steps.forEach((step, index) => {
+      step.classList.toggle('active', index < targetStep);
+    });
+
+    const progressFill = indicator.querySelector('.progress-fill');
+    const progressPercent = ((targetStep - 1) / (steps.length - 1)) * 100;
+    progressFill.style.width = `${progressPercent}%`;
+  }
+
+  // updates navigation buttons
+  const navigation = form.querySelector('.step-navigation');
+  if (navigation) {
+    // eslint-disable-next-line no-use-before-define
+    navigation.replaceWith(createStepNavigation(targetStep, getTotalSteps(form), form));
+  }
+
+  // populates summary if navigating to step 4
+  if (targetStep === 4) {
+    // eslint-disable-next-line no-use-before-define
+    populateSummary(form);
+  }
+
+  if (window.innerWidth < 1200) {
+    form.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
+
+  // stores current step
+  form.dataset.currentStep = targetStep;
 }
 
 function createStepIndicator(totalSteps, currentStep) {
@@ -409,7 +486,7 @@ function createStepIndicator(totalSteps, currentStep) {
 
   const stepsWrapper = createTag('div', { class: 'steps-wrapper' });
 
-  for (let i = 1; i <= totalSteps; i++) {
+  for (let i = 1; i <= totalSteps; i += 1) {
     const step = createTag('div', { class: `step ${i <= currentStep ? 'active' : ''}` });
     const stepNumber = createTag('span', { class: 'step-number' }, i.toString());
     step.append(stepNumber);
@@ -443,72 +520,25 @@ function createStepNavigation(currentStep, totalSteps, formElement) {
   return wrapper;
 }
 
-function navigateStep(form, targetStep) {
-  // hides the steps
-  form.querySelectorAll('.form-step').forEach((step) => {
-    step.style.display = 'none';
-  });
-
-  // Show target step
-  const targetStepElement = form.querySelector(`[data-step="${targetStep}"]`);
-  if (targetStepElement) {
-    targetStepElement.style.display = 'block';
-  }
-
-  // updates the step indicator as in showing the current step you are currently on and the progress bar
-  const indicator = form.querySelector('.step-indicator');
-  if (indicator) {
-    const steps = indicator.querySelectorAll('.step');
-    steps.forEach((step, index) => {
-      step.classList.toggle('active', index < targetStep);
-    });
-
-    const progressFill = indicator.querySelector('.progress-fill');
-    const progressPercent = ((targetStep - 1) / (steps.length - 1)) * 100;
-    progressFill.style.width = `${progressPercent}%`;
-  }
-
-  // updates the navigation buttons
-  const navigation = form.querySelector('.step-navigation');
-  if (navigation) {
-    navigation.replaceWith(createStepNavigation(targetStep, getTotalSteps(form), form));
-  }
-
-  // populates the summary if navigating to step 4
-  if (targetStep === 4) {
-    populateSummary(form);
-  }
-
-  if (window.innerWidth < 1200) {
-    form.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  }
-
-  // stores current step
-  form.dataset.currentStep = targetStep;
-}
-
 function populateSummary(form) {
-  // gets all the form data
+  // gets all form data
   const formData = constructPayload(form);
   const { payload, files } = formData;
 
-  // populates the text and select summary fields
+  // populates text and select summary fields
   const summaryMappings = {
-    'summaryGender': 'gender',
-    'summaryLastName': 'lastName',
-    'summaryBirth': 'birth',
-    'summaryEmail': 'email',
-    'summaryNumber': 'number',
-    'summaryMotivationText': 'motivationText',
-    'summaryProjectUrls': 'projectUrls',
-    'summaryAdditionalMessage': 'additionalMessage'
+    summaryGender: 'gender',
+    summaryLastName: 'lastName',
+    summaryBirth: 'birth',
+    summaryEmail: 'email',
+    summaryNumber: 'number',
+    summaryMotivationText: 'motivationText',
+    summaryProjectUrls: 'projectUrls',
+    summaryAdditionalMessage: 'additionalMessage',
   };
 
-  // populates the text fields
-  Object.keys(summaryMappings).forEach(summaryField => {
+  // populates text fields
+  Object.keys(summaryMappings).forEach((summaryField) => {
     const originalField = summaryMappings[summaryField];
     const summaryElement = form.querySelector(`#${summaryField}_display`);
     if (summaryElement) {
@@ -517,24 +547,24 @@ function populateSummary(form) {
     }
   });
 
-  // populates the file summary fields
+  // populates file summary fields
   const fileSummaryMappings = {
-    'summaryCv': 'cv',
-    'summaryProfilePicture': 'profilePicture',
-    'summaryMotivation': 'motivation',
-    'summaryCertificates': 'certificates',
-    'summaryMulticheck': 'multicheck',
-    'summaryAdditionalDocs': 'additionalDocs'
+    summaryCv: 'cv',
+    summaryProfilePicture: 'profilePicture',
+    summaryMotivation: 'motivation',
+    summaryCertificates: 'certificates',
+    summaryMulticheck: 'multicheck',
+    summaryAdditionalDocs: 'additionalDocs',
   };
 
-  Object.keys(fileSummaryMappings).forEach(summaryField => {
+  Object.keys(fileSummaryMappings).forEach((summaryField) => {
     const originalField = fileSummaryMappings[summaryField];
     const summaryElement = form.querySelector(`#${summaryField}_display`);
     if (summaryElement) {
       const fileIndicator = summaryElement.querySelector('.file-summary-indicator');
       if (files[originalField] && files[originalField].length > 0) {
         const fileCount = files[originalField].length;
-        const fileNames = files[originalField].map(f => f.name).join(', ');
+        const fileNames = files[originalField].map((f) => f.name).join(', ');
         fileIndicator.innerHTML = `${fileCount} file(s): ${fileNames}`;
         fileIndicator.style.color = '#10b981';
       } else {
@@ -543,30 +573,6 @@ function populateSummary(form) {
       }
     }
   });
-}
-
-function validateCurrentStep(form, step) {
-  const stepElement = form.querySelector(`[data-step="${step}"]`);
-  const requiredFields = stepElement.querySelectorAll('[required]');
-
-  let valid = true;
-  requiredFields.forEach((field) => {
-    if (!field.checkValidity()) {
-      field.reportValidity();
-      valid = false;
-    }
-  });
-
-  return valid;
-}
-
-function getTotalSteps(form) {
-  return form.querySelectorAll('.form-step').length;
-}
-
-function saveFormDataToSession(form) {
-  const formData = constructPayload(form);
-  sessionStorage.setItem(`formData_${form.dataset.action}`, JSON.stringify(formData));
 }
 
 function loadFormDataFromSession(form) {
@@ -592,11 +598,11 @@ function createTextArea({ field, placeholder, required, defval }) {
   return input;
 }
 
-function createSummaryField({ field, label, required }) {
+function createSummaryField({ field, required }) {
   const div = createTag('div', {
     class: 'summary-value',
     'data-summary-for': field.replace('summary', '').toLowerCase(),
-    id: `${field}_display`
+    id: `${field}_display`,
   });
   div.textContent = '—'; // placeholder until populated
 
@@ -607,11 +613,11 @@ function createSummaryField({ field, label, required }) {
   return div;
 }
 
-function createFileSummaryField({ field, label, required }) {
+function createFileSummaryField({ field, required }) {
   const div = createTag('div', {
     class: 'file-summary-value',
     'data-summary-for': field.replace('summary', '').toLowerCase(),
-    id: `${field}_display`
+    id: `${field}_display`,
   });
 
   const fileIndicator = createTag('div', { class: 'file-summary-indicator' });
