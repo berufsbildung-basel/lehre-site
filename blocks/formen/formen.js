@@ -410,6 +410,11 @@ function createFileInput({ field, required }) {
   });
 
   input.addEventListener('change', (e) => {
+    const tooBig = Array.from(e.target.files).filter((file) => file.size > MAX_FILE_SIZE);
+    if (tooBig.length > 0) {
+      e.target.value = ''; // deletes invalid files internally
+      fileList.innerHTML = ''; // deletes from view
+    }
     const invalidFiles = Array.from(e.target.files).filter((file) => {
       const ext = file.name.split('.').pop().toLowerCase();
       return field === 'profilePicture'
