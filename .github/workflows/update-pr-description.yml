@@ -1,0 +1,25 @@
+name: Update PR Description
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  update-description:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const branchName = context.payload.pull_request.head.ref;
+            
+            if (body.includes('{BRANCH_NAME}')) {
+              const newBody = body.replace(/{BRANCH_NAME}/g, branchName);
+              
+              await github.rest.pulls.update({
+                ...context.repo,
+                pull_number: context.payload.pull_request.number,
+                body: newBody
+              });
+            }

@@ -1,5 +1,5 @@
 URL for testing:
 
-- https://{{ github.head_ref }}--lehre-site--berufsbildung-basel.aem.page/
+- https://{BRANCH_NAME}--lehre-site--berufsbildung-basel.aem.page/
 
 Issue:
