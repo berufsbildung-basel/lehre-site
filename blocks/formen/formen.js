@@ -335,7 +335,7 @@ function createFileInput({ field, required }) {
 
   const dropZone = createTag('div', { class: 'file-drop-zone' });
   const attachButton = createTag('button', { type: 'button', class: 'attach-file-btn' }, 'Attach file');
-  const dropTextContent = field === 'profilePicture' ? 'Drop images here (JPG, PNG, GIF)' : 'Drop PDF files here';
+  const dropTextContent = field === 'profilePicture' ? 'Drop images here (JPG, PNG, GIF, up to 2MB)' : 'Drop PDF files here (up to 2MB)';
   const dropText = createTag('span', { class: 'drop-text' }, dropTextContent);
 
   dropZone.append(attachButton, dropText);
@@ -347,7 +347,7 @@ function createFileInput({ field, required }) {
   const fileList = createTag('div', { class: 'file-list' });
 
   function showErrorMessage(message) {
-    errorMessage.textContent = message;
+    errorMessage.innerHTML = message;
     errorMessage.style.display = 'block';
     setTimeout(() => {
       errorMessage.style.display = 'none';
@@ -410,23 +410,41 @@ function createFileInput({ field, required }) {
   });
 
   input.addEventListener('change', (e) => {
-    const tooBig = Array.from(e.target.files).filter((file) => file.size > MAX_FILE_SIZE);
+    const filesArr = Array.from(e.target.files || []);
+
+    // SIZE CHECK
+    const compressLink = 'https://acrobat.adobe.com/link/acrobat/compress-pdf';
+
+    const tooBig = Array.from(e.target.files || []).filter((f) => f.size > MAX_FILE_SIZE);
     if (tooBig.length > 0) {
+      showErrorMessage(
+        'Please make sure that the file you upload is up to 2MB or use our '
+        + `<a href="${compressLink}" target="_blank" rel="noopener noreferrer">PDF compression tool</a>.`,
+      );
       e.target.value = '';
       fileList.innerHTML = '';
+      return;
     }
-    const invalidFiles = Array.from(e.target.files).filter((file) => {
+    // TYPE CHECK (unchanged)
+    const invalidFiles = filesArr.filter((file) => {
       const ext = file.name.split('.').pop().toLowerCase();
       return field === 'profilePicture'
         ? !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
         : ext !== 'pdf';
     });
-
     if (invalidFiles.length > 0) {
-      showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
-      e.target.value = ''; // clears the files from the input field
+      const msg = `Invalid file type. Only ${field === 'profilePicture' ? 'images (JPG, PNG, GIF, WEBP)' : 'PDFs'} allowed: ${
+        invalidFiles.map((f) => f.name).join(', ')}`;
+      showErrorMessage(msg);
+      input.setCustomValidity(msg);
+      input.reportValidity();
+      e.target.value = '';
+      fileList.innerHTML = '';
+      return;
     }
 
+    // valid -> clear any previous custom error
+    input.setCustomValidity('');
     updateFileList();
   });
 
