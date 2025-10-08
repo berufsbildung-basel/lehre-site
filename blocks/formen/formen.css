@@ -1002,3 +1002,58 @@
 /* .formen div.form-step[data-step="4"] {
   justify-items: center;
 } */
+
+.formen .edit-field-btn {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  border: 1px solid var(--gray-300);
+  color: var(--gray-500);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+  min-width: 32px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.formen .edit-field-btn:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);  /* LINE 1020 - HOVER COLOR */
+  border-color: var(--primary-hover);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgb(37 99 235 / 20%)
+}
+
+.formen .edit-field-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgb(37 99 235 / 20%);
+}
+
+.formen .summary-value,
+.formen .file-summary-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.formen .summary-text,
+.formen .file-status-text {
+  flex: 1;
+  min-width: 0;
+}
+
+@media screen and (max-width: 600px) {
+  .formen .edit-field-btn {
+    font-size: 14px;
+    min-width: 36px;
+    height: 28px;
+    padding: 6px;
+  }
+}
