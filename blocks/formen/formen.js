@@ -423,7 +423,7 @@ function createFileInput({ field, required }) {
 
     // SIZE CHECK
     const tooBig = Array.from(e.target.files || []).filter((f) => f.size > MAX_FILE_SIZE);
-    if (tooBig.length > 0) {
+    if (tooBig) {
       showErrorMessage(
         'Please make sure that the file you upload is up to 2MB or use our '
         + `<a href="${PDF_COMPRESS_TOOL}" target="_blank" rel="noopener noreferrer">PDF compression tool</a>.`,
