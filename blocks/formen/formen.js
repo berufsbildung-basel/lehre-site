@@ -16,6 +16,8 @@ const RULE_OPERATORS = {
 // eslint-disable-next-line no-unused-vars
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB limit
 
+const PDF_COMPRESS_TOOL = 'https://acrobat.adobe.com/link/acrobat/compress-pdf';
+
 const miloLibs = getLibs();
 const { createTag } = await import(`${miloLibs}/utils/utils.js`);
 
@@ -395,13 +397,20 @@ function createFileInput({ field, required }) {
     const files = Array.from(e.dataTransfer.files);
     const invalidFiles = files.filter((file) => {
       const ext = file.name.split('.').pop().toLowerCase();
-      return field === 'profilePicture'
+      const typeInvalid = field === 'profilePicture'
         ? !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
         : ext !== 'pdf';
+      const sizeInvalid = file.size > MAX_FILE_SIZE;
+      return typeInvalid || sizeInvalid;
     });
 
     if (invalidFiles.length > 0) {
-      showErrorMessage(`Invalid file type. Only ${field === 'profilePicture' ? 'images' : 'PDFs'} allowed.`);
+      showErrorMessage(
+        'Please make sure that the file you upload is in PDF format and up to 2MB or use our '
+        + `<a href="${PDF_COMPRESS_TOOL}" target="_blank" rel="noopener noreferrer">PDF compression tool</a>.`,
+      );
+      input.setCustomValidity('One or more files are invalid or exceed the size limit.');
+      input.reportValidity();
       return;
     }
 
@@ -413,19 +422,16 @@ function createFileInput({ field, required }) {
     const filesArr = Array.from(e.target.files || []);
 
     // SIZE CHECK
-    const compressLink = 'https://acrobat.adobe.com/link/acrobat/compress-pdf';
-
     const tooBig = Array.from(e.target.files || []).filter((f) => f.size > MAX_FILE_SIZE);
     if (tooBig.length > 0) {
       showErrorMessage(
         'Please make sure that the file you upload is up to 2MB or use our '
-        + `<a href="${compressLink}" target="_blank" rel="noopener noreferrer">PDF compression tool</a>.`,
+        + `<a href="${PDF_COMPRESS_TOOL}" target="_blank" rel="noopener noreferrer">PDF compression tool</a>.`,
       );
       e.target.value = '';
       fileList.innerHTML = '';
       return;
     }
-    // TYPE CHECK (unchanged)
     const invalidFiles = filesArr.filter((file) => {
       const ext = file.name.split('.').pop().toLowerCase();
       return field === 'profilePicture'
