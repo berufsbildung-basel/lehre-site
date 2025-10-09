@@ -529,6 +529,7 @@ function getFieldStepMapping() {
     email: 1,
     number: 1,
     cv: 2,
+    profilePicture: 2,
     motivation: 2,
     motivationText: 2,
     certificates: 3,
