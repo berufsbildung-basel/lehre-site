@@ -544,6 +544,11 @@ function createEditButton(fieldName, form) {
   const stepMapping = getFieldStepMapping();
   const targetStep = stepMapping[fieldName];
 
+  if (!targetStep) {
+    console.warn(`No step mapping found for this field: ${fieldName}`);
+    return createTag('span');
+  }
+
   const editBtn = createTag('button', {
     type: 'button',
     class: 'edit-field-btn',
