@@ -539,7 +539,32 @@ function getFieldStepMapping() {
   };
 }
 
+function createEditButton(fieldName, form) {
+  const stepMapping = getFieldStepMapping();
+  const targetStep = stepMapping[fieldName];
 
+  if (!targetStep) {
+    // eslint-disable-next-line no-console
+    console.warn(`No step mapping found for this field: ${fieldName}`);
+    return createTag('span');
+  }
+
+  const editBtn = createTag('button', {
+    type: 'button',
+    class: 'edit-field-btn',
+    title: `Edit ${fieldName}`,
+    'data-field': fieldName,
+    'data-target-step': targetStep,
+  });
+
+  editBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    saveFormDataToSession(form);
+    navigateStep(form, targetStep);
+  });
+
+  return editBtn;
+}
 
 function populateSummary(form) {
   // gets all form data
@@ -564,10 +589,10 @@ function populateSummary(form) {
     const summaryElement = form.querySelector(`#${summaryField}_display`);
     if (summaryElement) {
       const value = payload[originalField] || '-';
-      
+
       summaryElement.innerHTML = '';
-      
-      const valueSpan = createTag('span', { class: 'summary-text'}, value);
+
+      const valueSpan = createTag('span', { class: 'summary-text' }, value);
       const editBtn = createEditButton(originalField, form);
 
       summaryElement.appendChild(valueSpan);
@@ -610,32 +635,6 @@ function populateSummary(form) {
       fileIndicator.appendChild(editBtn);
     }
   });
-}
-
-function createEditButton(fieldName, form) {
-  const stepMapping = getFieldStepMapping();
-  const targetStep = stepMapping[fieldName];
-
-  if (!targetStep) {
-    console.warn(`No step mapping found for this field: ${fieldName}`);
-    return createTag('span');
-  }
-
-  const editBtn = createTag('button', {
-    type: `button`,
-    class: `edit-field-btn`,
-    title: `Edit ${fieldName}`,
-    'data-field': fieldName,
-    'data-target-step': targetStep
-  },'✏️');
-
-  editBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    saveFormDataToSession(form);
-    navigateStep(form, targetStep);
-  });
-
-  return editBtn;
 }
 
 function loadFormDataFromSession(form) {
