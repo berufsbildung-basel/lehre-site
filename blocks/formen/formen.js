@@ -574,6 +574,7 @@ function populateSummary(form) {
   // populates text and select summary fields
   const summaryMappings = {
     summaryGender: 'gender',
+    summaryFirstName: 'firstName',
     summaryLastName: 'lastName',
     summaryBirth: 'birth',
     summaryEmail: 'email',
