@@ -17,7 +17,6 @@ const adaptForTextExtension = (el) => {
   el.classList.toggle('higher-clamp', isExtensionActive);
 };
 
-// testing something
 const getCardType = (styles) => {
   const cardTypes = {
     'half-card': HALF,
