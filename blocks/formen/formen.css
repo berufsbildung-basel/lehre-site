@@ -1047,6 +1047,15 @@
   min-width: 0;
 }
 
+/* File status colors */
+.formen .file-status-no-files {
+  color: var(--gray-500); /* #6b7280 */
+}
+
+.formen .file-status-has-files {
+  color: var(--success-color); /* #10b981 */
+}
+
 @media screen and (max-width: 600px) {
   .formen .edit-field-btn {
     font-size: 14px;

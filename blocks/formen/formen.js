@@ -618,17 +618,22 @@ function populateSummary(form) {
       const fileIndicator = summaryElement.querySelector('.file-summary-indicator');
 
       let statusText;
+      let hasFiles = false;
       if (files[originalField] && files[originalField].length > 0) {
         const fileCount = files[originalField].length;
         const fileNames = files[originalField].map((f) => f.name).join(', ');
         statusText = `${fileCount} file(s): ${fileNames}`;
-        fileIndicator.style.color = '#10b981';
+        hasFiles = true;
       } else {
         statusText = 'No files attached';
-        fileIndicator.style.color = '#6b7280';
+        hasFiles = false;
       }
 
+      // Clear existing classes and content
+      fileIndicator.classList.remove('file-status-has-files', 'file-status-no-files');
       fileIndicator.innerHTML = '';
+      // Add appropriate CSS class for styling
+      fileIndicator.classList.add(hasFiles ? 'file-status-has-files' : 'file-status-no-files');
       const textSpan = createTag('span', { class: 'file-status-text' }, statusText);
       const editBtn = createEditButton(originalField, form);
 
