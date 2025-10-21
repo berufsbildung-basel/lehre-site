@@ -520,8 +520,7 @@ function createStepNavigation(currentStep, totalSteps, formElement) {
   return wrapper;
 }
 
-function getFieldStepMapping() {
-  return {
+const stepMapping = {
     gender: 1,
     firstName: 1,
     lastName: 1,
@@ -536,12 +535,10 @@ function getFieldStepMapping() {
     multicheck: 3,
     additionalDocs: 3,
     projectUrls: 3,
-    additionalMessage: 3,
-  };
-}
+    additionalMessage: 3
+};
 
 function createEditButton(fieldName, form) {
-  const stepMapping = getFieldStepMapping();
   const targetStep = stepMapping[fieldName];
 
   if (!targetStep) {
@@ -619,7 +616,7 @@ function populateSummary(form) {
 
       let statusText;
       let hasFiles = false;
-      if (files[originalField] && files[originalField].length > 0) {
+      if (files[originalField]?.length > 0) {
         const fileCount = files[originalField].length;
         const fileNames = files[originalField].map((f) => f.name).join(', ');
         statusText = `${fileCount} file(s): ${fileNames}`;
