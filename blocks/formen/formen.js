@@ -521,21 +521,21 @@ function createStepNavigation(currentStep, totalSteps, formElement) {
 }
 
 const stepMapping = {
-    gender: 1,
-    firstName: 1,
-    lastName: 1,
-    birth: 1,
-    email: 1,
-    number: 1,
-    cv: 2,
-    profilePicture: 2,
-    motivation: 2,
-    motivationText: 2,
-    certificates: 3,
-    multicheck: 3,
-    additionalDocs: 3,
-    projectUrls: 3,
-    additionalMessage: 3
+  gender: 1,
+  firstName: 1,
+  lastName: 1,
+  birth: 1,
+  email: 1,
+  number: 1,
+  cv: 2,
+  profilePicture: 2,
+  motivation: 2,
+  motivationText: 2,
+  certificates: 3,
+  multicheck: 3,
+  additionalDocs: 3,
+  projectUrls: 3,
+  additionalMessage: 3,
 };
 
 function createEditButton(fieldName, form) {
