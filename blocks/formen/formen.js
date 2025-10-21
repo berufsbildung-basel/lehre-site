@@ -549,6 +549,49 @@ function createStepNavigation(currentStep, totalSteps, formElement) {
   return wrapper;
 }
 
+const stepMapping = {
+  gender: 1,
+  firstName: 1,
+  lastName: 1,
+  birth: 1,
+  email: 1,
+  number: 1,
+  cv: 2,
+  profilePicture: 2,
+  motivation: 2,
+  motivationText: 2,
+  certificates: 3,
+  multicheck: 3,
+  additionalDocs: 3,
+  projectUrls: 3,
+  additionalMessage: 3,
+};
+
+function createEditButton(fieldName, form) {
+  const targetStep = stepMapping[fieldName];
+
+  if (!targetStep) {
+    console.warn(`No step mapping found for this field: ${fieldName}`);
+    return createTag('span');
+  }
+
+  const editBtn = createTag('button', {
+    type: 'button',
+    class: 'edit-field-btn',
+    title: `Edit ${fieldName}`,
+    'data-field': fieldName,
+    'data-target-step': targetStep,
+  });
+
+  editBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    saveFormDataToSession(form);
+    navigateStep(form, targetStep);
+  });
+
+  return editBtn;
+}
+
 function populateSummary(form) {
   // gets all form data
   const formData = constructPayload(form);
@@ -557,6 +600,7 @@ function populateSummary(form) {
   // populates text and select summary fields
   const summaryMappings = {
     summaryGender: 'gender',
+    summaryFirstName: 'firstName',
     summaryLastName: 'lastName',
     summaryBirth: 'birth',
     summaryEmail: 'email',
@@ -571,8 +615,15 @@ function populateSummary(form) {
     const originalField = summaryMappings[summaryField];
     const summaryElement = form.querySelector(`#${summaryField}_display`);
     if (summaryElement) {
-      const value = payload[originalField] || '—';
-      summaryElement.textContent = value;
+      const value = payload[originalField] || '-';
+
+      summaryElement.innerHTML = '';
+
+      const valueSpan = createTag('span', { class: 'summary-text' }, value);
+      const editBtn = createEditButton(originalField, form);
+
+      summaryElement.appendChild(valueSpan);
+      summaryElement.appendChild(editBtn);
     }
   });
 
@@ -591,15 +642,29 @@ function populateSummary(form) {
     const summaryElement = form.querySelector(`#${summaryField}_display`);
     if (summaryElement) {
       const fileIndicator = summaryElement.querySelector('.file-summary-indicator');
-      if (files[originalField] && files[originalField].length > 0) {
+
+      let statusText;
+      let hasFiles = false;
+      if (files[originalField]?.length > 0) {
         const fileCount = files[originalField].length;
         const fileNames = files[originalField].map((f) => f.name).join(', ');
-        fileIndicator.innerHTML = `${fileCount} file(s): ${fileNames}`;
-        fileIndicator.style.color = '#10b981';
+        statusText = `${fileCount} file(s): ${fileNames}`;
+        hasFiles = true;
       } else {
-        fileIndicator.innerHTML = 'No files attached';
-        fileIndicator.style.color = '#6b7280';
+        statusText = 'No files attached';
+        hasFiles = false;
       }
+
+      // Clear existing classes and content
+      fileIndicator.classList.remove('file-status-has-files', 'file-status-no-files');
+      fileIndicator.innerHTML = '';
+      // Add appropriate CSS class for styling
+      fileIndicator.classList.add(hasFiles ? 'file-status-has-files' : 'file-status-no-files');
+      const textSpan = createTag('span', { class: 'file-status-text' }, statusText);
+      const editBtn = createEditButton(originalField, form);
+
+      fileIndicator.appendChild(textSpan);
+      fileIndicator.appendChild(editBtn);
     }
   });
 }
